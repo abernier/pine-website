@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pine</title>
+<meta name="description" content="pine: agents that wake up when something happens, and write code with you.">
+<meta name="theme-color" content="#c4c4c1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/src/style.css">
+<link rel="stylesheet" href="/src/app.css">
+<script type="module" src="/src/main.ts"></script>
+</head>
+<body>
+<main>
+
+<!-- ============================================================ 00 · PINE -->
+<section class="panel t-dark hero" aria-label="pine">
+	<div class="guides g" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+	<div class="g">
+		<h1 class="crop" aria-label="PINE">
+			<svg viewBox="0 0 3480 800" aria-hidden="true"><use href="#logo"/></svg>
+		</h1>
+	</div>
+
+	<div class="g bar-row">
+		<div class="bar">
+			<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17M14 6l6 6-6 6"/></svg>
+			<span class="hatch"><span class="fill"></span></span>
+			<svg class="ico ico-ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5" class="dot"/></svg>
+		</div>
+	</div>
+
+	<div class="g lead">
+		<div class="claim" style="--c: 1 / 6; --cm: 1 / 5">
+			<p class="h1">Agents that<br>wake up.</p>
+			<p class="small dim">When something happens, an agent goes to work.<br>When you write to it, it writes code.</p>
+		</div>
+		<ul class="stats" style="--c: 7 / 13; --cm: 1 / -1">
+			<li><svg class="ico ico-ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11"/><path d="M8 12h8M12 8v8"/></svg><span><em>Event sources</em><b>21</b></span><i>01</i></li>
+			<li><svg class="ico ico-ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11"/><rect x="8" y="8" width="8" height="8"/></svg><span><em>Modes, sandbox to bypass</em><b>4</b></span><i>02</i></li>
+			<li><svg class="ico ico-ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11"/><circle cx="12" cy="12" r="3"/></svg><span><em>Daemon, always on</em><b>1</b></span><i>03</i></li>
+		</ul>
+	</div>
+
+	<nav class="g meta top-rule">
+		<span style="--c: 1 / 4; --cm: 1 / 3; --cs: 1 / 3">Event-driven agents</span>
+		<span style="--c: 4 / 7; --cm: 3 / 5" class="hide-s">Local first · MIT</span>
+		<span style="--c: 7 / 10" class="hide-m">macOS · Linux</span>
+		<span style="--c: 10 / 13; --cm: 5 / 7; --cs: 3 / 5" class="links"><a href="https://github.com/pmndre/pine">GitHub ↗</a><a href="#install">Install ↓</a></span>
+	</nav>
+
+	<div class="g">
+		<div class="shot bleed-b" style="--w: 1280; --h: 800; --ch: 640; --xs: 250; --ws: 500" data-scale>
+			<!--shot:hero-->
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================ 01 · EVENTS -->
+<section class="panel t-light events" aria-labelledby="events-h">
+	<div class="guides g" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+	<div class="g meta bottom-rule">
+		<span style="--c: 1 / 4; --cm: 1 / 3; --cs: 1 / 3">01 — Events</span>
+		<span style="--c: 4 / 7; --cm: 3 / 5" class="hide-s">Something happens</span>
+		<span style="--c: 7 / 10" class="hide-m">A subscription wakes an agent</span>
+		<span style="--c: 10 / 13; --cm: 5 / 7; --cs: 3 / 5" class="r">→ It goes to work</span>
+	</div>
+
+	<div class="g body">
+		<p class="vword" aria-hidden="true" style="--c: 1 / 4"><span data-drift>Listen</span></p>
+		<div class="copy" style="--c: 4 / 8; --cm: 1 / -1">
+			<h2 id="events-h" class="h2">Something happens.<br>An agent wakes.</h2>
+			<ol class="src">
+				<li>Mail</li><li>Slack</li><li>Telegram</li><li>Discord</li><li>Matrix</li><li data-show="events-github">Webhook</li><li data-show="events-scan">Folder</li><li>Feed</li><li>Calendar</li><li data-show="events-price">HTTP</li><li>MQTT</li><li>Modbus</li><li>Serial</li><li>Syslog</li><li>ONVIF</li><li>SMTP</li><li>FTP</li><li>Stream</li><li>Command</li><li>Presence</li><li>System</li><li class="yours">Yours</li>
+			</ol>
+			<p class="small">A letter in a folder, a message in a channel, a sensor, a camera, a feed, a clock. Each is a source. An agent subscribes, and sleeps until it fires.</p>
+		</div>
+		<div class="stage" style="--c: 8 / 13; --cm: 2 / 6; --cs: 1 / -1">
+			<div class="show-cap" aria-live="polite">
+				<p class="on" data-show="events-scan"><i>01.1</i>A letter is scanned. mrbanks files the bill.</p>
+				<p data-show="events-github"><i>01.2</i>A pull request opens. reviewer reads it.</p>
+				<p data-show="events-price"><i>01.3</i>A price drops. scout tells you.</p>
+			</div>
+			<div class="shot bleed-b" style="--w: 1280; --h: 800; --x: 250; --wd: 500; --ch: 760" data-scale data-show-of="events-scan events-github events-price">
+				<!--shot:events-scan-->
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- ============================================================ TICKER -->
+<section class="panel t-black ticker" aria-label="The event log">
+	<div class="guides g"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+	<div class="g meta">
+		<span style="--c: 1 / 4; --cm: 1 / 4; --cs: 1 / 3">Log · live</span>
+		<span style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5" class="r">trust: other</span>
+	</div>
+	<p class="run" data-drift aria-hidden="true"><span>22:56:14 scans/added → mrbanks</span><span>22:56:18 github/received → reviewer</span><span>22:56:23 fridge/changed → scout</span><span>22:56:14 scans/added → mrbanks</span></p>
+	<div class="g">
+		<div class="shot" style="--w: 1280; --h: 800; --x: 250; --y: 236; --wd: 1030; --ch: 264; --xs: 250; --ws: 640" data-scale>
+			<!--shot:events-log-->
+		</div>
+	</div>
+	<div class="g meta">
+		<span style="--c: 1 / 4; --cm: 1 / 4; --cs: 1 / 3">0 polling by agents</span>
+		<span style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5" class="r">1 route per subscription</span>
+	</div>
+</section>
+
+<!-- ============================================================ 02 · CODE -->
+<section class="panel t-dark code" aria-labelledby="code-h">
+	<div class="guides g" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+	<div class="g meta bottom-rule">
+		<span style="--c: 1 / 4; --cm: 1 / 3; --cs: 1 / 3">02 — Code</span>
+		<span style="--c: 4 / 7; --cm: 3 / 5" class="hide-s">You talk</span>
+		<span style="--c: 7 / 10" class="hide-m">It writes</span>
+		<span style="--c: 10 / 13; --cm: 5 / 7; --cs: 3 / 5" class="r">You run it ▶</span>
+	</div>
+
+	<div class="g">
+		<h2 id="code-h" class="mega" aria-label="Code"><span data-drift>Code</span></h2>
+	</div>
+
+	<div class="g layered">
+		<div class="side-note" style="--c: 1 / 3; --cm: 1 / -1">
+			<p class="h3">Talk.<br>It writes.<br>You run.</p>
+			<ol class="show-list" data-list-of="code">
+				<li class="on" data-show="code-folder"><i>02.1</i><b>Folder</b><span>Open one. The conversation works in it.</span></li>
+				<li data-show="code-worktree"><i>02.2</i><b>Worktree</b><span>A branch of its own, in a checkout of its own.</span></li>
+				<li data-show="code-diff"><i>02.3</i><b>Diff</b><span>What changed, line by line, beside the talk.</span></li>
+				<li data-show="code-run"><i>02.4</i><b>Run ▶</b><span>Your terminal, in the same window.</span></li>
+				<li data-show="code-browser"><i>02.5</i><b>Browser</b><span>It opens the page. You see it, and can use it.</span></li>
+			</ol>
+		</div>
+		<div class="shot bleed-r" style="--w: 1280; --h: 800; --ch: 800; --xs: 740; --ws: 540; --c: 3 / 13; --cm: 1 / -1" data-scale data-show-of="code-folder code-worktree code-diff code-run code-browser">
+			<!--shot:code-folder-->
+		</div>
+	</div>
+	<div class="g pad-b"></div>
+</section>
+
+<!-- ============================================================ 03 · MODES -->
+<section class="panel t-mid modes" aria-labelledby="modes-h">
+	<div class="guides g" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+	<div class="g meta bottom-rule">
+		<span style="--c: 1 / 4; --cm: 1 / 3; --cs: 1 / 3" id="modes-h">03 — Reach</span>
+		<span style="--c: 4 / 7; --cm: 3 / 5" class="hide-s">You say how far</span>
+		<span style="--c: 7 / 10" class="hide-m">The system enforces it</span>
+		<span style="--c: 10 / 13; --cm: 5 / 7; --cs: 3 / 5" class="r">sandbox-exec · bwrap</span>
+	</div>
+
+	<ol class="stack">
+		<li class="solid"><span class="w" data-drift>Safe</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>01</b>In the sandbox. Asks before anything leaves.</span></span></li>
+		<li class="line"><span class="w" data-drift="-1">Manual</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>02</b>In the sandbox. Asks about everything.</span></span></li>
+		<li class="white"><span class="w" data-drift>Auto</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>03</b>Your account. Asks when it matters.</span></span></li>
+		<li class="line"><span class="w" data-drift="-1">Bypass</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>04</b>Your account. Asks nothing.</span></span></li>
+	</ol>
+</section>
+
+<!-- ============================================================ 04 · INSTALL -->
+<section class="panel t-paper install" id="install" aria-labelledby="install-h">
+	<div class="guides g" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+	<div class="g meta bottom-rule">
+		<span style="--c: 1 / 4; --cm: 1 / 3; --cs: 1 / 3">04 — Install</span>
+		<span style="--c: 4 / 7; --cm: 3 / 5" class="hide-s">Your machine</span>
+		<span style="--c: 7 / 10" class="hide-m">Your models, or anyone's</span>
+		<span style="--c: 10 / 13; --cm: 5 / 7; --cs: 3 / 5" class="r">MIT</span>
+	</div>
+
+	<div class="g headline">
+		<h2 id="install-h" class="wide" style="--c: 1 / 9; --cm: 1 / 5; --cs: 1 / -1">Run it<br>yourself</h2>
+		<p class="wide r" style="--c: 9 / 13; --cm: 5 / 7; --cs: 1 / -1" aria-label="24/7">24<br>—7</p>
+	</div>
+
+	<div class="g cards">
+		<div class="card dark" style="--c: 1 / 7; --cm: 1 / -1">
+			<p class="card-h"><span>Terminal</span><i>04.1</i></p>
+			<div class="cmd">
+				<code><span>$</span> npm install -g @pmndre/pine</code>
+				<code><span>$</span> pine init</code>
+				<button type="button" class="copy-btn" data-copy="npm install -g @pmndre/pine && pine init">Copy</button>
+			</div>
+		</div>
+		<a class="card grey" style="--c: 7 / 10; --cm: 1 / 4; --cs: 1 / -1" href="https://github.com/pmndre/pine/releases/latest">
+			<p class="card-h"><span>App</span><i>04.2</i></p>
+			<p class="card-big">Pine.app<span>macOS ↓</span></p>
+		</a>
+		<a class="card outline" style="--c: 10 / 13; --cm: 4 / 7; --cs: 1 / -1" href="https://github.com/pmndre/pine">
+			<p class="card-h"><span>Source</span><i>04.3</i></p>
+			<p class="card-big">GitHub<span>pmndre/pine ↗</span></p>
+		</a>
+	</div>
+
+	<footer class="g meta top-rule">
+		<span style="--c: 1 / 4; --cm: 1 / 3; --cs: 1 / 3"><svg class="mark" viewBox="0 0 3480 800" aria-label="pine"><use href="#logo"/></svg></span>
+		<span style="--c: 4 / 7; --cm: 3 / 5" class="hide-s">pine.pmnd.re</span>
+		<span style="--c: 7 / 10" class="hide-m">An agent daemon on pi</span>
+		<span style="--c: 10 / 13; --cm: 5 / 7; --cs: 3 / 5" class="r">2026</span>
+	</footer>
+</section>
+
+</main>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+	<symbol id="logo" viewBox="0 0 3480 800"><path fill="currentColor" d="M280 560h240v240H280zM280 280h240v240H280zM0 280h240v240H0zM560 0H280v240h280v280h240V0zM1080 0h240v240h-240zM1080 280h240v240h-240zM1080 560h240v240h-240zM1600 0h240v240h-240zM1600 280h240v240h-240zM1600 560h240v240h-240zM2160 560h240v240h-240zM1880 0h240v240h-240zM2120 0h40v240h-40zM2160 0h240v240h-240zM2160 240h240v40h-240zM2160 280h240v240h-240zM3240 0h240v240h-240zM2960 280h240v240h-240zM2680 560h240v240h-240zM2960 560h240v240h-240zM3240 560h240v240h-240zM2680 0h240v240h-240zM2920 0h40v240h-40zM2680 240h240v40h-240zM2960 0h240v240h-240zM2680 280h240v240h-240z"/></symbol>
+</svg>
+</body>
+</html>
