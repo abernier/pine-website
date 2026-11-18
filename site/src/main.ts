@@ -43,7 +43,8 @@ for (const shot of document.querySelectorAll<HTMLElement>("[data-show-of]")) {
 		(fetched ??= Promise.all(
 			names.map(async (name) => {
 				if (scene(name)) return;
-				const html = await fetch(`/shots/${name}.html`).then((r) => (r.ok ? r.text() : ""), () => "");
+				// (Cloudflare Pages serves a page without its .html and redirects to there; Vite only with it.)
+				const html = await fetch(import.meta.env.DEV ? `/shots/${name}.html` : `/shots/${name}`).then((r) => (r.ok ? r.text() : ""), () => "");
 				if (!html) return;
 				const el = document.createElement("div");
 				el.className = "scene";
