@@ -434,7 +434,7 @@ a.card:hover { transform: translateY(-4px); }
 	position: relative;
 	aspect-ratio: var(--wv) / var(--ch, var(--hin));
 	border-radius: 10px;
-	background: #1a1b21;
+	background: #1b1e28;
 }
 @media (max-width: 639px) { .shot { --win: var(--wp, var(--w)); --hin: var(--hp, var(--h)); --wv: var(--ws, var(--wd, var(--win))); --xh: var(--xs, var(--x, 0)); --yv: var(--ys, var(--y, 0)); } }
 .bleed-b { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
@@ -449,7 +449,7 @@ a.card:hover { transform: translateY(-4px); }
 	border: 0;
 	transform: scale(var(--s, 1)) translate(calc(var(--xv) * -1px), calc(var(--yv) * -1px));
 	transform-origin: 0 0;
-	background: #1a1b21;
+	background: #1b1e28;
 	color-scheme: dark;
 	pointer-events: none;
 	opacity: 0;
