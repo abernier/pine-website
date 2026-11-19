@@ -185,6 +185,13 @@ main { padding-top: var(--m); }
 .links a:hover { opacity: 0.6; }
 
 .hero .shot { margin-top: calc(var(--u) * 3); }
+/* The steps of the hero's show, in a row: each over its own three columns. */
+.show-list.steps { display: grid; margin-top: calc(var(--u) * 5); row-gap: 0; }
+.steps li { padding: 14px 0 0; background: none; box-shadow: inset 0 1px 0 var(--line); cursor: pointer; }
+.steps li:first-child { box-shadow: inset 0 1px 0 var(--line); }
+.steps li::after { top: -1px; bottom: auto; }
+.show-list.steps li span { max-height: none; opacity: 0.55; margin-top: 4px; font-size: 13px; line-height: 18px; }
+.show-list.steps li.on span { max-height: none; opacity: 0.8; margin-top: 4px; }
 
 /* ---------------------------------------------------------------- 01 · events */
 
@@ -390,7 +397,6 @@ a.card:hover { transform: translateY(-4px); }
 	cursor: pointer;
 }
 .copy-btn:active { transform: scale(0.97); }
-.mark { height: 14px; width: auto; display: block; color: var(--ink); }
 @media (max-width: 639px) {
 	.cmd code { padding-right: 0; }
 	.copy-btn { position: static; align-self: flex-start; margin-top: 8px; }
@@ -408,15 +414,18 @@ a.card:hover { transform: translateY(-4px); }
 	--yv: var(--y, 0);
 	position: relative;
 	aspect-ratio: var(--wv) / var(--ch, var(--h));
-	overflow: clip;
 	border-radius: 10px;
 	background: #1a1b21;
 }
+/* The window is cut by its scenes, not by the shot: the pointer may leave it. A shot without scenes cuts itself. */
+.shot:not(:has(.scene)) { overflow: clip; }
 @media (max-width: 639px) { .shot { --wv: var(--ws, var(--wd, var(--w))); --xv: var(--xs, var(--x, 0)); --yv: var(--ys, var(--y, 0)); } }
 .bleed-b { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
 .scene {
 	position: absolute;
 	inset: 0;
+	overflow: clip;
+	border-radius: inherit;
 	opacity: 0;
 	visibility: hidden;
 	transition: opacity 0.7s cubic-bezier(.2, .7, .2, 1), transform 0.7s cubic-bezier(.2, .7, .2, 1), visibility 0s 0.7s;
@@ -440,6 +449,10 @@ a.card:hover { transform: translateY(-4px); }
 	user-select: none;
 }
 .pine-body { height: 100%; }
+/* Two things the app does live: the blur behind its questions, and a fade at the edges of what scrolls,
+   which is drawn from the scroll itself. A shot does not scroll, so its edges are not faded. */
+.pine-shot [data-slot=dialog-overlay] { backdrop-filter: blur(4px); }
+.pine-shot [class*="scroll-fade"], .pine-shot [data-slot=scroll-area-viewport] { mask-image: none !important; }
 .pine-shot * { scrollbar-width: none; }
 .pine-shot *::-webkit-scrollbar { display: none; }
 /* The window's buttons: the system draws them, so they are not in the page that was taken. */
@@ -453,6 +466,32 @@ a.card:hover { transform: translateY(-4px); }
 	z-index: 100;
 	background: radial-gradient(circle at 6px 6px, #ff5f57 5.5px, transparent 6px), radial-gradient(circle at 26px 6px, #febc2e 5.5px, transparent 6px), radial-gradient(circle at 46px 6px, #28c840 5.5px, transparent 6px);
 }
+
+/* The owner's hand: its tip is the point. It keeps its size whatever the scale of the window. */
+.pointer {
+	position: absolute;
+	left: -5px;
+	top: -2.5px;
+	z-index: 5;
+	width: 24px;
+	height: 24px;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.3s;
+	will-change: transform;
+}
+.pointer svg { display: block; width: 24px; height: 24px; fill: #0b0b0b; stroke: #fff; stroke-width: 1.4; stroke-linejoin: round; filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.35)); transform-origin: 5px 2.5px; }
+.pointer b { position: absolute; left: -11px; top: -13.5px; width: 32px; height: 32px; border-radius: 50%; border: 2px solid #fff; opacity: 0; }
+.pointer.click svg { animation: press 0.32s; }
+.pointer.click b { animation: ripple 0.6s ease-out; }
+@keyframes press { 40% { transform: scale(0.82); } }
+@keyframes ripple { from { opacity: 0.9; transform: scale(0.3); } to { opacity: 0; transform: scale(1.4); } }
+@media (max-width: 639px) { .pointer { display: none; } }
+@media (hover: none) { .hide-touch { display: none; } }
+
+/* A row of the live log that has just come in. */
+.pine-shot .arrive { animation: arrive 1.4s cubic-bezier(.2, .7, .2, 1); }
+@keyframes arrive { from { opacity: 0; transform: translateY(8px); background-color: rgb(255 255 255 / 0.16); } 40% { opacity: 1; transform: none; } to { background-color: transparent; } }
 
 /* The list beside a show: which scene is on, and how long it has left. */
 .show-list { display: flex; flex-direction: column; }
