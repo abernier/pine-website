@@ -209,6 +209,15 @@
 		ownEl.style.display = p ? "" : "none";
 		if (p) (ownEl.style.translate = `${p.x}px ${p.y}px`), (ownEl.style.scale = down ? "0.6" : "1");
 	}
+	// Where the conversation is in the window (it moves when a panel opens beside it): a page that shows a part of the window shows that part.
+	if (host) {
+		let was;
+		setInterval(() => {
+			const box = document.querySelector("[data-slot=composer]")?.getBoundingClientRect();
+			const x = box?.width ? Math.round(box.left + box.width / 2) : undefined;
+			if (x !== undefined && x !== was) post("view", { x: (was = x) });
+		}, 400);
+	}
 	const W = () => window.innerWidth, H = () => window.innerHeight;
 	const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 	/** Just off the window, beyond the edge that is nearest to a place in it. */

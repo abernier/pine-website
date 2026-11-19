@@ -122,7 +122,12 @@ main { padding-top: var(--m); }
 .h1 { font-size: clamp(32px, 3.4cqw, 56px); text-transform: uppercase; font-stretch: 112%; font-weight: 800; letter-spacing: -0.03em; line-height: 0.92; }
 .h2 { font-size: clamp(32px, 3.4cqw, 56px); }
 .h3 { font-size: clamp(24px, 2.25cqw, 36px); }
-.small { font-size: 14px; line-height: 20px; max-width: 46ch; }
+.small { font-size: 14px; line-height: 20px; max-width: 46ch; text-wrap: pretty; }
+/* A short text of two or three lines has lines of about the same length: no single word left over at the end. */
+.h1, .h2, .h3, .wide, .show-list span, .show-cap p, .note > span, .card-big { text-wrap: balance; }
+/* Wide capitals have room at their left side that a line of them does not need: they stand on the column's edge. */
+.h1 { margin-left: -0.045em; }
+.wide:not(.r) { margin-left: -0.04em; }
 .dim { color: var(--dim); }
 
 /* ---------------------------------------------------------------- 00 · hero */
@@ -173,7 +178,7 @@ main { padding-top: var(--m); }
 }
 .stats li:first-child { background: linear-gradient(var(--line), var(--line)) 0 0 / 100% 1px no-repeat, linear-gradient(var(--line), var(--line)) 0 100% / 100% 1px no-repeat; }
 .stats .ico { width: 40px; height: 40px; stroke-width: 1; color: var(--dim); }
-.stats span { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.stats span { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .stats em { font-style: normal; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); }
 .stats b { font-size: clamp(32px, 3.4cqw, 48px); font-weight: 760; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
 .stats i { font-style: normal; font-size: 11px; color: var(--dim); width: 24px; text-align: right; }
@@ -182,29 +187,29 @@ main { padding-top: var(--m); }
 .links a { transition: opacity 0.2s; }
 .links a:hover { opacity: 0.6; }
 
-.hero .shot { margin-top: calc(var(--u) * 3); }
+.hero .shot { margin-top: calc(var(--u) * 2); }
 /* The steps of the hero's show, in a row: each over its own three columns. */
 .show-list.steps { display: grid; margin-top: calc(var(--u) * 5); row-gap: 0; }
-.steps li { padding: 14px 0 0; background: none; box-shadow: inset 0 1px 0 var(--line); cursor: pointer; }
-.steps li:first-child { box-shadow: inset 0 1px 0 var(--line); }
-.steps li::after { top: -1px; bottom: auto; }
-.show-list.steps li span { max-height: none; opacity: 0.55; margin-top: 4px; font-size: 13px; line-height: 18px; }
-.show-list.steps li.on span { max-height: none; opacity: 0.8; margin-top: 4px; }
+.show-list.steps li { padding: calc(var(--u) * 2) 0 calc(var(--u) * 3); background: none; box-shadow: inset 0 1px 0 var(--line); }
+.show-list.steps li::after { top: 0; bottom: auto; }
+.show-list.steps li span { max-height: none; min-height: 0; opacity: 0.55; margin-top: 4px; }
+.show-list.steps li.on span { max-height: none; min-height: 0; opacity: 0.8; margin-top: 4px; }
 
 /* ---------------------------------------------------------------- 01 · events */
 
-.events .body { position: relative; padding-top: calc(var(--u) * 6); row-gap: calc(var(--u) * 6); align-items: start; }
+.events .body { position: relative; padding-top: calc(var(--u) * 6); padding-bottom: calc(var(--u) * 6); row-gap: calc(var(--u) * 6); align-items: start; }
 .vword {
 	align-self: stretch;
 	position: relative;
-	margin-top: calc(var(--u) * -6);
+	margin-block: calc(var(--u) * -6);
 	margin-left: calc(var(--p) * -1);
 	overflow: clip;
 	min-height: 100%;
 }
 .vword span {
 	position: absolute;
-	right: 0;
+	/* (the letters' feet stand on the column's edge: the line's box is that much wider than they are) */
+	right: -0.034em;
 	bottom: -0.06em;
 	writing-mode: vertical-rl;
 	transform: rotate(180deg);
@@ -225,7 +230,7 @@ main { padding-top: var(--m); }
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
 	counter-reset: src;
-	margin-bottom: calc(var(--u) * 4);
+	margin-bottom: calc(var(--u) * 5);
 	background: linear-gradient(var(--line), var(--line)) 0 0 / 100% 1px no-repeat;
 }
 .src li {
@@ -239,7 +244,12 @@ main { padding-top: var(--m); }
 .src li::before { content: counter(src, decimal-leading-zero); color: var(--dim); width: 2ch; }
 .src li.yours { font-weight: 700; }
 .src li.yours::before { content: "+"; color: inherit; }
-.events .shot { margin-bottom: 0; }
+.copy .small { margin-bottom: 0; }
+/* Beside the list, the app's window is as high as the list is long (main.ts gives the app that height): both end on one line. */
+@media (min-width: 1024px) {
+	.events .stage { align-self: stretch; display: flex; flex-direction: column; }
+	.events .shot { flex: 1; aspect-ratio: auto; min-height: calc(var(--u) * 60); }
+}
 
 @media (max-width: 1023px) {
 	.vword { display: none; }
@@ -281,8 +291,15 @@ main { padding-top: var(--m); }
 }
 .mega span { display: block; }
 .layered { margin-top: -10cqw; position: relative; align-items: end; row-gap: calc(var(--u) * 5); }
-.side-note { padding-bottom: 0; align-self: end; }
-.side-note .h3 { margin-bottom: calc(var(--u) * 4); }
+/* The window lies over the big word by 10cqw. The list beside it does not: where it is higher than what is left
+   of the window's height, the row grows and the window overlaps the word by less. */
+.side-note { padding-top: calc(10cqw + var(--u) * 4); padding-bottom: 0; align-self: end; }
+.side-note .h3 { margin-bottom: calc(var(--u) * 5); }
+/* Two columns are narrow for it in a window that is not wide: there it has three, and the app's window nine. */
+@media (min-width: 1024px) and (max-width: 1439px) {
+	.layered .side-note { grid-column: 1 / 4; }
+	.layered .shot { grid-column: 4 / -1; }
+}
 .pad-b { height: calc(var(--u) * 6); }
 .stage { min-width: 0; }
 .bleed-r { margin-right: calc(var(--p) * -1); border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
@@ -301,7 +318,7 @@ main { padding-top: var(--m); }
 
 @media (max-width: 1023px) {
 	.layered { margin-top: -10cqw; }
-	.side-note { order: 2; }
+	.side-note { order: 2; padding-top: 0; }
 	.bleed-r { margin-right: 0; border-radius: 10px !important; }
 }
 
@@ -493,9 +510,15 @@ a.card:hover { transform: translateY(-4px); }
 .show-list li:first-child { box-shadow: inset 0 1px 0 var(--line); }
 .show-list li i { font: 500 11px/20px var(--mono); font-style: normal; }
 .show-list li b { font-size: 18px; line-height: 20px; font-weight: 720; letter-spacing: -0.02em; }
-.show-list li span { grid-column: 2; font-size: 13px; line-height: 18px; max-height: 0; overflow: clip; opacity: 0; transition: max-height 0.5s, opacity 0.5s, margin 0.5s; }
+/* What an item says of itself shows while it is on. It has the room of --lines lines whatever its length, so
+   that the list is as high with one item open as with another, and what stands above it stands still. */
+.show-list { --lines: 2; }
+@media (max-width: 1023px) { .show-list { --lines: 1; } }
+.show-list li span { grid-column: 2; font-size: 13px; line-height: 18px; max-height: 0; min-height: 0; overflow: clip; opacity: 0; transition: max-height 0.5s, min-height 0.5s, opacity 0.5s, margin 0.5s; }
 .show-list li.on { color: inherit; }
-.show-list li.on span { max-height: 72px; opacity: 0.6; margin-top: 6px; }
+.show-list li.on span { max-height: 72px; min-height: calc(var(--lines) * 18px); opacity: 0.6; margin-top: 6px; }
+/* The sign of "run" is a letter of the font, and larger than its capitals. */
+.show-list li b em { font-style: normal; font-size: 0.6em; vertical-align: 0.14em; margin-left: 0.3em; }
 .show-list li::after {
 	content: "";
 	position: absolute;
@@ -517,8 +540,9 @@ a.card:hover { transform: translateY(-4px); }
 .show-cap > p.on { opacity: 1; transform: none; }
 .show-cap i { font: 500 11px/20px var(--mono); font-style: normal; color: var(--dim); }
 
-.src li { transition: background-color 0.4s, color 0.4s; }
-.src li.on { background-color: var(--ink); color: var(--light); padding-inline: 8px; margin-inline: -8px; }
+/* The one that plays is a bar from edge to edge of its column, and its words step in from the edge. */
+.src li { transition: background-color 0.4s, color 0.4s, padding 0.4s cubic-bezier(.2, .7, .2, 1); }
+.src li.on { background-color: var(--ink); color: var(--light); padding-left: 12px; }
 .src li.on::before { color: inherit; opacity: 0.6; }
 
 /* ---------------------------------------------------------------- scroll

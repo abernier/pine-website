@@ -8,7 +8,7 @@ const still = matchMedia("(prefers-reduced-motion: reduce)");
 const num = (el: Element, name: string, or = 0) => Number(getComputedStyle(el).getPropertyValue(name)) || or;
 
 type Reel = { play(): void; pause(): void; seek(name: string): Promise<void> };
-type Said = { reel: string; type: "ready" | "chapter" | "end" | "pointer"; name?: string; ms?: number; x?: number; y?: number; down?: boolean; off?: boolean };
+type Said = { reel: string; type: "ready" | "chapter" | "end" | "pointer" | "view"; name?: string; ms?: number; x?: number; y?: number; down?: boolean; off?: boolean };
 
 const POINTER = '<svg viewBox="0 0 24 24"><path d="M5 2.5v17.2l4.3-4.1 2.8 6.6 3-1.3-2.8-6.5H18L5 2.5Z"/></svg><b></b>';
 
@@ -20,14 +20,19 @@ for (const shot of document.querySelectorAll<HTMLElement>("[data-reel]")) {
 	const names = [...new Set(marks.map((m) => m.dataset.show!))];
 	const list = marks.find((m) => m.closest(".show-list"))?.closest<HTMLElement>(".show-list");
 
+	/** The window's height as the page says it; a window that fills the room it is given gets that room's height instead. */
+	const high = shot.style.getPropertyValue("--h");
 	const fit = () => {
-		shot.style.setProperty("--s", String(shot.clientWidth / num(shot, "--wv", 1280)));
+		const s = shot.clientWidth / num(shot, "--wv", 1280);
+		shot.style.setProperty("--s", String(s));
+		shot.style.setProperty("--h", getComputedStyle(shot).aspectRatio === "auto" && s ? String(Math.round(shot.clientHeight / s)) : high);
 		aim();
 	};
 
 	// Where a window is wider than its place (a phone shows a part of it), the part that shows follows the hand:
 	// to the side bar when it clicks there, to the panel when a diff opens, and back when it has left.
 	let point: { x: number; y: number } | undefined;
+	let talk: number | undefined;
 	let cam = NaN, camTo = NaN, camFrame = 0, camHome = 0;
 	const room = () => Math.max(0, num(shot, "--win", 1280) - num(shot, "--wv", 1280));
 	const place = () => {
@@ -46,8 +51,9 @@ for (const shot of document.querySelectorAll<HTMLElement>("[data-reel]")) {
 	function aim(x?: number) {
 		clearTimeout(camHome);
 		if (!room()) return void (shot.style.removeProperty("--xc"), (cam = NaN), place());
-		const home = num(shot, "--xh");
-		if (Number.isNaN(cam)) cam = home;
+		// Where nothing is pointed at, the conversation shows: the app says where its middle is.
+		const home = talk === undefined ? num(shot, "--xh") : talk - num(shot, "--wv", 1280) / 2;
+		if (Number.isNaN(cam)) cam = Math.min(room(), Math.max(0, home));
 		camTo = x === undefined ? home : x - num(shot, "--wv", 1280) / 2;
 		if (!camFrame) camFrame = requestAnimationFrame(pan);
 	}
@@ -145,6 +151,9 @@ for (const shot of document.querySelectorAll<HTMLElement>("[data-reel]")) {
 				if (apart) next();
 				else load();
 			}, 350);
+		} else if (said.type === "view") {
+			talk = said.x;
+			if (!hand.classList.contains("on")) aim();
 		} else if (said.type === "pointer") {
 			if (said.off) {
 				hand.classList.remove("on");
