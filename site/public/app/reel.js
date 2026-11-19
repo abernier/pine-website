@@ -63,14 +63,44 @@
 	// scrolls what scrolls inside the window and nothing above it. Opened by itself, the page keeps its focus.
 	const focus = HTMLElement.prototype.focus;
 	HTMLElement.prototype.focus = function (options) { if (!host) focus.call(this, { ...options, preventScroll: true }); };
-	Element.prototype.scrollIntoView = function () {
+	/** Where an element is; one that has no box of its own (display: contents) is where what is in it is. */
+	const boxOf = (el) => {
+		if (el.getClientRects().length) return el.getBoundingClientRect();
+		const range = document.createRange();
+		range.selectNodeContents(el);
+		return range.getClientRects().length ? range.getBoundingClientRect() : undefined;
+	};
+	Element.prototype.scrollIntoView = function (how) {
+		const block = how === false ? "end" : (typeof how === "object" && how?.block) || "start";
+		const behavior = typeof how === "object" ? how?.behavior : undefined;
+		const margin = getComputedStyle(this);
 		for (let box = this.parentElement; box; box = box.parentElement) {
-			if (box.scrollHeight <= box.clientHeight + 1 || !/auto|scroll/.test(getComputedStyle(box).overflowY)) continue;
-			const el = this.getBoundingClientRect(), b = box.getBoundingClientRect();
-			if (el.top < b.top) box.scrollTop -= b.top - el.top;
-			else if (el.bottom > b.bottom) box.scrollTop += el.bottom - b.bottom;
+			const style = getComputedStyle(box);
+			if (box.scrollHeight <= box.clientHeight + 1 || !/auto|scroll|hidden/.test(style.overflowY)) continue;
+			// (What is not drawn at all is nowhere: nothing scrolls for it, as in the browser's own.)
+			const el = boxOf(this);
+			if (!el) return;
+			const top = box.getBoundingClientRect().top + box.clientTop + (parseFloat(style.scrollPaddingTop) || 0);
+			const bottom = box.getBoundingClientRect().top + box.clientTop + box.clientHeight - (parseFloat(style.scrollPaddingBottom) || 0);
+			const first = el.top - (parseFloat(margin.scrollMarginTop) || 0), last = el.bottom + (parseFloat(margin.scrollMarginBottom) || 0);
+			const by = block === "start" ? first - top : block === "end" ? last - bottom : block === "center" ? (first + last) / 2 - (top + bottom) / 2 : first < top ? first - top : last > bottom ? last - bottom : 0;
+			if (Math.abs(by) >= 1) box.scrollTo({ top: box.scrollTop + by, behavior });
 		}
 	};
+
+	// A fault of the app's conversation view, kept from showing here. Opened on a conversation that has messages
+	// already, the view takes the first of them for a new one as soon as a message comes in the place of the
+	// "working" line (a command the owner ran is such a one), and goes to the very top. In the app that takes a
+	// restart in the middle of a conversation; here a story is started in the middle whenever a chapter is
+	// picked. So in a story that starts at a chapter, a jump of that view to its first line goes to its end.
+	if (q.get("at")) {
+		const scrollTo = Element.prototype.scrollTo;
+		Element.prototype.scrollTo = function (...a) {
+			const to = a[0];
+			if (this.dataset?.slot === "message-scroller-viewport" && to && typeof to === "object" && to.top === 0 && this.scrollTop > 0) return scrollTo.call(this, { ...to, top: this.scrollHeight });
+			return scrollTo.apply(this, a);
+		};
+	}
 
 	// On a Mac the system draws the window's three buttons into the page's top left corner and tells the page how
 	// much room they take (env(titlebar-area-x), which the app's `pl-window-buttons` reads). The site draws them
@@ -306,7 +336,7 @@
 		if (a.do === "rest") return quick || !pointer ? undefined : glide(outside(pointer), mine, true);
 		const el = await found(a, mine, quick ? 3000 : 6000);
 		if (!el) return;
-		el.scrollIntoView();
+		el.scrollIntoView({ block: "nearest" });
 		const show = !quick && !a.quiet;
 		if (a.do === "click") {
 			if (show) {

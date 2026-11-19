@@ -120,8 +120,19 @@ function world() {
 	git("add", ".");
 	git("commit", "-q", "-m", "a cart");
 	write(path.join(BASE, "Documents", "protocol.pdf"), PROTOCOL_PDF);
-	// The owner's shell in the app's terminal, with a prompt that names nobody.
-	write(path.join(home, "zsh", ".zshrc"), "PROMPT='%1~ %# '\nunsetopt PROMPT_SP\n");
+	// The owner's shell in the app's terminal, with a prompt that names nobody, and the made-up world's programs first.
+	write(path.join(home, "zsh", ".zshrc"), `PROMPT='%1~ %# '\nunsetopt PROMPT_SP\nexport PATH="${path.join(home, "bin")}:$PATH"\n`);
+	// gh, as far as the story needs it: it asks for a secret as GitHub's own does, shows none of it, and says what
+	// that one says. It sets nothing anywhere: the repository is as made up as the shop.
+	write(path.join(home, "bin", "gh"), `#!/bin/bash
+if [ "$1 $2" != "secret set" ]; then echo "gh: only 'secret set' is here" >&2; exit 1; fi
+printf '? Paste your secret: '
+while IFS= read -r -s -n1 key; do [ -z "$key" ] && break; printf '*'; done
+printf '\\n'
+sleep 0.7
+printf '\\033[32m✓\\033[0m Set Actions secret %s for %s\\n' "$3" "$5"
+`);
+	fs.chmodSync(path.join(home, "bin", "gh"), 0o755);
 }
 
 // ---- the events the sources report ---------------------------------------------------------------
@@ -209,10 +220,16 @@ s.applepay = [
 	{ tools: [{ name: "write", args: { path: "src/pay/apple.ts", content: APPLE } }] },
 	{ tools: [{ name: "edit", args: { path: "src/checkout.tsx", edits: [{ oldText: 'import { stripe } from "./pay/stripe.ts";\n', newText: 'import { stripe } from "./pay/stripe.ts";\nimport { applePay } from "./pay/apple.ts";\n' }, { oldText: "    <Pay total={total}>\n", newText: "    <Pay total={total}>\n      {applePay.available() && <ApplePay onPay={() => applePay.charge(total * 100)} />}\n" }] } }] },
 	{ tools: [{ name: "write", args: { path: "test/apple.test.ts", content: APPLE_TEST } }] },
+	{ tools: [{ name: "bash", args: { command: "npm test 2>&1 | tail -8" } }] },
 	{ tools: [{ name: "bash", args: { command: "git add -A && git commit -qm 'Apple Pay' && git log --oneline -2" } }] },
-	{ text: "Apple Pay is in, behind a check for the wallet, with two tests of its own, and committed on its branch. Run them:\n\n```bash\nnpm test\n```" },
+	{ text: "Apple Pay is in, behind a check for the wallet, with two tests of its own. All 3 tests pass, and it is committed on its branch." },
 ];
-s.ran = [{ text: "All 3 tests pass. The button only shows where there is a wallet, so try it in Safari." }];
+// A command that takes a secret is the owner's to run: the agent hands it over, hears how it went, and goes on.
+s.secret = [{ text: "The deploy reads the key from the repository's secrets. The key is yours and I should not see it, so run this, and paste the key when it asks:\n\n```bash\ngh secret set STRIPE_KEY --repo example/shop\n```\n\nI go on when it is set." }];
+s.ran = [
+	{ tools: [{ name: "edit", args: { path: "README.md", edits: [{ oldText: "The little shop: a cart, a checkout, payments.\n", newText: "The little shop: a cart, a checkout, payments.\n\nThe deploy reads `STRIPE_KEY` from the repository's secrets.\n" }] } }] },
+	{ text: "`STRIPE_KEY` is set for example/shop, and I never saw it. The deploy can charge now; I noted in the README where the key comes from." },
+];
 const steps = (...st) => ({ tools: [{ name: "todo", args: { items: [["Write a test for the coupon", st[0]], ["Take the coupon off the total", st[1]], ["Run all the tests", st[2]]].map(([text, status]) => ({ text, status })) } }] });
 s.goal1 = [
 	steps("in_progress", "pending", "pending"),
@@ -254,7 +271,7 @@ for (const script of Object.values(s)) for (const step of script) {
 /** Which script a request is for, by what its last message says. The message itself stays as it came. */
 const MEANS = [
 	[/^new agent: mrbanks/, "make"], [/^watch ~\/Documents\/scans/, "teach"], [/water-bill\.pdf/, "bill"],
-	[/^build the checkout page/, "checkout"], [/^add Apple Pay/, "applepay"], [/ran a command from your answer/, "ran"], [/^open the checkout/, "browser"],
+	[/^build the checkout page/, "checkout"], [/^add Apple Pay/, "applepay"], [/^the deploy needs my Stripe key/, "secret"], [/ran a command from your answer/, "ran"], [/^open the checkout/, "browser"],
 	// The goal's first round is asked in other words than the rounds after it.
 	[/set this as the goal of this conversation/, "goal1"], [/set a goal for this conversation/, "goal2"],
 	[/Add coupon codes/, "pr"], [/fridge-3000/, "price"], [/lease-renewal/, "lease"], [/this is the protocol of our heat pump/, "yours"],
@@ -396,6 +413,7 @@ const FIND = (spec) => {
 const note = (k, a) => void R.push({ k, t: Date.now(), a });
 async function click(spec, more = {}) {
 	const el = (await page.waitForFunction(FIND, spec, { timeout: 30_000 })).asElement();
+	if (process.env.TRACE) console.log("  click", JSON.stringify(spec), "->", await el.evaluate((e) => `${e.tagName.toLowerCase()} "${(e.getAttribute("aria-label") ?? e.textContent ?? "").trim().slice(0, 40)}" at ${Math.round(e.getBoundingClientRect().left)},${Math.round(e.getBoundingClientRect().top)}`));
 	note("act", { do: "click", ...spec, ...more });
 	await el.click();
 	await sleep(350);
@@ -495,7 +513,7 @@ async function start(name) {
 		env: {
 			...process.env, PINE_HOME: home, PINE_DESKTOP_DATA: path.join(home, "desktop-data"), PINE_SKIP_DOWNLOADS: "1", PINE_DESKTOP_DEV_URL: "", PINE_DESKTOP_RELEASES: "", PINE_DESKTOP_BACKGROUND: "1",
 			// The terminal's shell reads its startup files from here (world() writes them): a prompt that names nobody.
-			SHELL: "/bin/zsh", ZDOTDIR: path.join(home, "zsh"),
+			SHELL: "/bin/zsh", ZDOTDIR: path.join(home, "zsh"), PINE_DESKTOP_STILL_RUNNING_MS: "60000",
 			GIT_AUTHOR_NAME: "pine", GIT_AUTHOR_EMAIL: "pine@example.invalid", GIT_COMMITTER_NAME: "pine", GIT_COMMITTER_EMAIL: "pine@example.invalid",
 		},
 	});
@@ -678,7 +696,7 @@ async function code() {
 	hold(900);
 	await tell("add Apple Pay");
 	rest();
-	await said(/Run them/);
+	await said(/committed on its branch/);
 	await quiet();
 	hold(400);
 	await click(TAB("Changes"));
@@ -692,13 +710,29 @@ async function code() {
 	await quiet();
 	hold(3000);
 
-	// The tests, by the ▶ of the answer's code block, in the terminal beside the conversation.
+	// What needs a secret is the owner's to run: by the ▶ of the answer's code block, in the terminal beside the
+	// conversation, where the key is pasted. The agent hears how it went, and goes on.
+	const shown = (re) => page.waitForFunction((src) => new RegExp(src).test(document.querySelector("[data-slot=terminal] .xterm-rows")?.textContent ?? ""), re.source, { timeout: 30_000 });
 	await checkpoint("run", [{ do: "menu", command: "code-turn" }]);
-	await click({ sel: "[data-slot=markdown] [data-run]", last: true });
-	await page.waitForFunction(() => /pass 3/.test(document.querySelector("[data-slot=terminal] .xterm-rows")?.textContent ?? ""), undefined, { timeout: 30_000 });
-	await said(/try it in Safari/);
+	await tell("the deploy needs my Stripe key");
+	rest();
+	await said(/I go on when it is set/);
 	await quiet();
-	hold(2200);
+	hold(900);
+	await click({ sel: "[data-slot=markdown] [data-run]", last: true });
+	await shown(/Paste your secret/);
+	await sleep(500);
+	hold(500);
+	// Into the terminal, and the key from the clipboard. (What is pasted is no key, and none of it is kept.)
+	await click({ sel: "[data-slot=terminal]" });
+	await sleep(700);
+	await page.keyboard.insertText("made-up-not-a-key-0000");
+	await sleep(900);
+	await page.keyboard.press("Enter");
+	await shown(/Set Actions secret/);
+	await said(/I never saw it/);
+	await quiet();
+	hold(2600);
 
 	// A goal: the agent keeps a list of steps and goes on, round after round, until the goal is reached.
 	await checkpoint("steps", [{ do: "menu", command: "code-changes" }]);
