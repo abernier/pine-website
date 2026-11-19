@@ -53,10 +53,10 @@
 	</nav>
 
 	<ol class="g show-list steps" aria-label="An agent for the bills">
-		<li class="on" data-show="make" style="--c: 1 / 4; --cm: 1 / 4; --cs: 1 / 3"><i>00.1</i><b>Make</b><span>You ask for an agent. You say yes.</span></li>
-		<li data-show="tell" style="--c: 4 / 7; --cm: 4 / 7; --cs: 3 / 5"><i>00.2</i><b>Tell</b><span>It writes the job into its AGENTS.md.</span></li>
-		<li data-show="sleep" style="--c: 7 / 10; --cm: 1 / 4; --cs: 1 / 3"><i>00.3</i><b>Sleep</b><span>A letter is scanned. It reads every page.</span></li>
-		<li data-show="pay" style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5"><i>00.4</i><b>Pay</b><span>Who, how much, by when. Into TODO.md.</span></li>
+		<li class="on" data-show="make" style="--c: 1 / 4; --cm: 1 / 4; --cs: 1 / 3"><i>00.1</i><b>Make</b><span>You ask main for an agent, and allow it.</span></li>
+		<li data-show="tell" style="--c: 4 / 7; --cm: 4 / 7; --cs: 3 / 5"><i>00.2</i><b>Tell</b><span>You say what to watch. It writes that into its AGENTS.md.</span></li>
+		<li data-show="wake" style="--c: 7 / 10; --cm: 1 / 4; --cs: 1 / 3"><i>00.3</i><b>Wake</b><span>A letter is scanned. The agent wakes and reads both pages.</span></li>
+		<li data-show="due" style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5"><i>00.4</i><b>Due</b><span>Whom to pay, how much, by when: a line in TODO.md.</span></li>
 	</ol>
 
 	<div class="g">
@@ -80,12 +80,12 @@
 		<div class="copy" style="--c: 4 / 8; --cm: 1 / -1">
 			<h2 id="events-h" class="h2">Something happens.<br>An agent wakes.</h2>
 			<ol class="src" data-hover><li data-show="ev-mail">Mail</li><li data-show="ev-slack">Slack</li><li data-show="ev-telegram">Telegram</li><li data-show="ev-discord">Discord</li><li data-show="ev-matrix">Matrix</li><li data-show="ev-github">Webhook</li><li data-show="ev-downloads">Folder</li><li data-show="ev-feed">Feed</li><li data-show="ev-calendar">Calendar</li><li data-show="ev-fridge">HTTP</li><li data-show="ev-mqtt">MQTT</li><li data-show="ev-modbus">Modbus</li><li data-show="ev-serial">Serial</li><li data-show="ev-syslog">Syslog</li><li data-show="ev-onvif">ONVIF</li><li data-show="ev-smtp">SMTP</li><li data-show="ev-ftp">FTP</li><li data-show="ev-stream">Stream</li><li data-show="ev-command">Command</li><li data-show="ev-presence">Presence</li><li data-show="ev-system">System</li><li data-show="ev-yours" class="yours">Yours</li></ol>
-			<p class="small">A letter in a folder, a message in a channel, a sensor, a camera, a feed, a clock. Each is a source. An agent subscribes, and sleeps until it fires. <span class="dim hide-touch">Point at one.</span></p>
+			<p class="small">A letter in a folder, a message in a channel, a sensor, a camera, a feed, a clock. Each is a source. An agent subscribes to one, and sleeps until it reports something. <span class="dim hide-touch">Point at one.</span></p>
 		</div>
 		<div class="stage" style="--c: 8 / 13; --cm: 2 / 6; --cs: 1 / -1">
 			<div class="show-cap" aria-live="polite">
-				<p class="on" data-show="ev-mail"><i>01.01</i>A mail comes. postie says what it wants.</p>
-				<p data-show="ev-slack"><i>01.02</i>Somebody asks in #deploys. ops looks.</p>
+				<p class="on" data-show="ev-mail"><i>01.01</i>A mail arrives. postie says what it asks of you.</p>
+				<p data-show="ev-slack"><i>01.02</i>Somebody asks in #deploys. ops looks into it.</p>
 				<p data-show="ev-telegram"><i>01.03</i>You ask from your phone. main answers there.</p>
 				<p data-show="ev-discord"><i>01.04</i>A bug report in #bugs. reviewer reads the code.</p>
 				<p data-show="ev-matrix"><i>01.05</i>Mum asks in Family. postie tells you.</p>
@@ -95,14 +95,14 @@
 				<p data-show="ev-calendar"><i>01.09</i>An appointment moves. main sees the clash.</p>
 				<p data-show="ev-fridge"><i>01.10</i>A price drops. scout tells you.</p>
 				<p data-show="ev-mqtt"><i>01.11</i>The washer goes quiet. watchdog says it is done.</p>
-				<p data-show="ev-modbus"><i>01.12</i>The battery is full. Time for the dishwasher.</p>
+				<p data-show="ev-modbus"><i>01.12</i>The battery is full. watchdog says what to run.</p>
 				<p data-show="ev-serial"><i>01.13</i>The soil is dry. watchdog says water it.</p>
-				<p data-show="ev-syslog"><i>01.14</i>Somebody tries passwords on the router.</p>
-				<p data-show="ev-onvif"><i>01.15</i>Motion at the door, and nobody is home.</p>
+				<p data-show="ev-syslog"><i>01.14</i>Somebody tries passwords on the router. ops says how to stop it.</p>
+				<p data-show="ev-onvif"><i>01.15</i>Motion at the door, and nobody is home. watchdog keeps watching.</p>
 				<p data-show="ev-smtp"><i>01.16</i>The NAS mails a disk warning. ops reads it.</p>
 				<p data-show="ev-ftp"><i>01.17</i>The scanner uploads a letter. postie reads it.</p>
 				<p data-show="ev-stream"><i>01.18</i>A build fails. ops finds the test.</p>
-				<p data-show="ev-command"><i>01.19</i>The disk fills up. ops finds with what.</p>
+				<p data-show="ev-command"><i>01.19</i>The disk fills up. ops finds what filled it.</p>
 				<p data-show="ev-presence"><i>01.20</i>A phone comes home. watchdog knows whose.</p>
 				<p data-show="ev-system"><i>01.21</i>The Mac wakes. main says what you missed.</p>
 				<p data-show="ev-yours"><i>01.22</i>A device of your own? Hand main its protocol.</p>
@@ -117,15 +117,15 @@
 	<div class="guides g"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 	<div class="g meta">
 		<span style="--c: 1 / 4; --cm: 1 / 4; --cs: 1 / 3">Log · live</span>
-		<span style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5" class="r">trust: other</span>
+		<span style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5" class="r">Events, as they happen</span>
 	</div>
 	<p class="run" data-drift aria-hidden="true"><span>08:12:04 scans/added → mrbanks</span><span>08:12:31 mqtt/message → watchdog</span><span>08:13:02 github/received → reviewer</span><span>08:13:40 syslog/line → ops</span><span>08:14:11 mail/mail → postie</span><span>08:14:58 fridge/changed → scout</span></p>
 	<div class="g">
 		<div class="shot" style="--w: 1120; --h: 380; --wp: 640; --hp: 420" data-reel="log"></div>
 	</div>
 	<div class="g meta">
-		<span style="--c: 1 / 4; --cm: 1 / 4; --cs: 1 / 3">0 polling by agents</span>
-		<span style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5" class="r">1 route per subscription</span>
+		<span style="--c: 1 / 4; --cm: 1 / 4; --cs: 1 / 3">No agent polls</span>
+		<span style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5" class="r">A subscription is one route</span>
 	</div>
 </section>
 
@@ -150,9 +150,9 @@
 			<ol class="show-list">
 					<li class="on" data-show="folder"><i>02.1</i><b>Folder</b><span>Open one. The conversation works in it.</span></li>
 					<li data-show="worktree"><i>02.2</i><b>Worktree</b><span>A branch of its own. Merge it when you like it.</span></li>
-					<li data-show="diff"><i>02.3</i><b>Diff</b><span>What changed, line by line, beside the talk.</span></li>
+					<li data-show="diff"><i>02.3</i><b>Diff</b><span>What changed, line by line, beside the conversation.</span></li>
 					<li data-show="run"><i>02.4</i><b>Run<em aria-hidden="true">▶</em></b><span>A command in the answer runs in your terminal.</span></li>
-					<li data-show="steps"><i>02.5</i><b>Steps</b><span>It keeps a list, and works it off.</span></li>
+					<li data-show="steps"><i>02.5</i><b>Steps</b><span>It keeps a list of steps, and ticks them off.</span></li>
 					<li data-show="goal"><i>02.6</i><b>Goal</b><span>It goes on until the goal is met.</span></li>
 					<li data-show="browser"><i>02.7</i><b>Browser</b><span>It opens the page. You see it, and can use it.</span></li>
 				</ol>
@@ -175,7 +175,7 @@
 
 	<ol class="stack">
 		<li class="solid"><span class="w" data-drift>Safe</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>01</b>In the sandbox. Asks before anything leaves.</span></span></li>
-		<li class="line"><span class="w" data-drift="-1">Manual</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>02</b>In the sandbox. Asks about everything.</span></span></li>
+		<li class="line"><span class="w" data-drift="-1">Manual</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>02</b>In the sandbox. Asks before each action.</span></span></li>
 		<li class="white"><span class="w" data-drift>Auto</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>03</b>Your account. Asks when it matters.</span></span></li>
 		<li class="line"><span class="w" data-drift="-1">Bypass</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>04</b>Your account. Asks nothing.</span></span></li>
 	</ol>

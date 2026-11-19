@@ -189,7 +189,7 @@ s.make = [
 s.teach = [
 	{ tools: [{ name: "add_source", args: { name: "scans", type: "folder", description: "the scanner's folder", options: { dir: scans }, note: "A letter was scanned: say what it is, the payment details, and add it to TODO.md." } }] },
 	{ tools: [{ name: "edit", args: { path: "AGENTS.md", edits: [] } }] },
-	{ text: "Watching `~/Documents/scans`. The job is in my `AGENTS.md`, so I keep it in every conversation." },
+	{ text: "Watching `~/Documents/scans`. The job is in my `AGENTS.md`, so I know it whenever I wake." },
 ];
 s.bill = [
 	{ tools: [{ name: "bash", args: { command: `mkdir -p pages && pdftoppm -r 40 -png ${scans}/water-bill.pdf pages/water-bill` } }], delayMs: 900 },
@@ -213,7 +213,7 @@ s.applepay = [
 	{ text: "Apple Pay is in, behind a check for the wallet, with two tests of its own, and committed on its branch. Run them:\n\n```bash\nnpm test\n```" },
 ];
 s.ran = [{ text: "All 3 tests pass. The button only shows where there is a wallet, so try it in Safari." }];
-const steps = (...st) => ({ tools: [{ name: "todo", args: { items: [["Write a test for the coupon", st[0]], ["Take the coupon off the total", st[1]], ["Run every test", st[2]]].map(([text, status]) => ({ text, status })) } }] });
+const steps = (...st) => ({ tools: [{ name: "todo", args: { items: [["Write a test for the coupon", st[0]], ["Take the coupon off the total", st[1]], ["Run all the tests", st[2]]].map(([text, status]) => ({ text, status })) } }] });
 s.goal1 = [
 	steps("in_progress", "pending", "pending"),
 	{ tools: [{ name: "write", args: { path: "test/coupon.test.ts", content: COUPON_TEST } }] },
@@ -600,16 +600,16 @@ async function hero() {
 	gitIn(desk, "add", ".");
 	gitIn(desk, "commit", "-q", "-m", "mrbanks");
 	const lastLine = fs.readFileSync(path.join(desk, "AGENTS.md"), "utf8").trimEnd().split("\n").pop() + "\n";
-	s.teach[1].tools[0].args.edits = [{ oldText: lastLine, newText: `${lastLine}\n## Scans\n\nThe scanner puts letters into ~/Documents/scans. For every new one:\n- say in one line what it is and who sent it\n- the payment details: payee, IBAN, amount, due date, reference\n- a line in TODO.md, with the amount and the date\n` }];
+	s.teach[1].tools[0].args.edits = [{ oldText: lastLine, newText: `${lastLine}\n## Scans\n\nThe scanner puts letters into ~/Documents/scans. For each new one:\n- say in one line what it is and who sent it\n- the payment details: payee, IBAN, amount, due date, reference\n- a line in TODO.md, with the amount and the date\n` }];
 
 	await checkpoint("tell");
 	await click({ sel: '[aria-label="Conversations with mrbanks"] [title^="mrbanks · main"]' });
 	await sees('[data-slot=tab][data-active] >> text=mrbanks');
 	await quiet();
-	await tell("watch ~/Documents/scans. for every letter: what it is, the payment details, a line in TODO.md");
+	await tell("watch ~/Documents/scans. for each letter: what it is, the payment details, a line in TODO.md");
 	rest();
 	await click(ALLOW);
-	await said(/every conversation/);
+	await said(/whenever I wake/);
 	await quiet();
 	hold(700);
 	// What it wrote into its own instructions, beside the conversation.
@@ -622,13 +622,13 @@ async function hero() {
 
 	// The letter is scanned. Nobody is at the window.
 	const DIFF = [{ do: "menu", command: "code-changes" }, { do: "click", sel: `${PANEL} [role=option]`, text: "AGENTS\\.md" }];
-	await checkpoint("sleep", DIFF);
+	await checkpoint("wake", DIFF);
 	hold(900);
 	fs.copyFileSync(path.join(pine, "reel", "bill", "water-bill.pdf"), path.join(scans, "water-bill.pdf"));
 	await page.waitForFunction(() => document.querySelectorAll("[data-slot=message-scroller-content] img").length >= 2, undefined, { timeout: 60_000 });
 	await pictures();
 	// The model takes its time before it writes the line (s.bill): the chapter turns in that pause.
-	await checkpoint("pay", DIFF);
+	await checkpoint("due", DIFF);
 	await said(/Added to/);
 	await quiet();
 	hold(900);
@@ -703,7 +703,7 @@ async function code() {
 	// A goal: the agent keeps a list of steps and goes on, round after round, until the goal is reached.
 	await checkpoint("steps", [{ do: "menu", command: "code-changes" }]);
 	await click(TAB("Changes"));
-	await tell("/goal the coupon works, and every test passes");
+	await tell("/goal the coupon works, and all tests pass");
 	rest();
 	await said(/That comes next/, 90_000);
 	// The second round starts with a pause of the model (s.goal2): the chapter turns in it.
