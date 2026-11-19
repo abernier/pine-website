@@ -10,6 +10,77 @@ const num = (el: Element, name: string, or = 0) => Number(getComputedStyle(el).g
 type Reel = { play(): void; pause(): void; seek(name: string): Promise<void> };
 type Said = { reel: string; type: "ready" | "chapter" | "end" | "pointer" | "view"; name?: string; ms?: number; x?: number; y?: number; down?: boolean; off?: boolean };
 
+/** How quickly something that follows comes to where it is going: after this long, two thirds of the way is done. */
+const TAU = 110;
+/** A step of following, however long the frame was. */
+const damp = (from: number, to: number, ms: number, tau = TAU) => to + (from - to) * Math.exp(-ms / tau);
+
+// ---- what moves with the scroll ----------------------------------------------------------------------
+//
+// Each such element has --v, how far the page has come for it, from 0 to 1 (style.css says what that moves).
+// --v does not jump to where the scroll is: it follows it, damped, so the wheel's steps come out as one glide.
+
+/** Which elements, and what their 0 and 1 are. */
+const FOLLOW: Array<[string, "page" | "top" | "pass" | "arrive" | "enter"]> = [
+	[".hatch .fill", "page"], // the whole page, top to bottom
+	[".crop", "top"], // the first screen
+	["[data-drift]", "pass"], // from coming in at the bottom to leaving at the top
+	[".hero .shot, .events .shot, .layered .shot", "arrive"], // from coming in to standing in the middle
+	[".src, .stats li", "enter"], // while it comes in
+];
+if (!still.matches) {
+	type Mover = { el: HTMLElement; kind: (typeof FOLLOW)[number][1]; top: number; height: number; v: number };
+	const movers: Mover[] = FOLLOW.flatMap(([sel, kind]) => [...document.querySelectorAll<HTMLElement>(sel)].map((el) => ({ el, kind, top: 0, height: 0, v: NaN })));
+	/** Where an element stands on the page, as the layout has it: what moves it (a transform) does not count. */
+	const measure = () => {
+		for (const m of movers) {
+			let top = 0;
+			for (let el: HTMLElement | null = m.el; el; el = el.offsetParent as HTMLElement | null) top += el.offsetTop;
+			m.top = top;
+			m.height = m.el.offsetHeight;
+		}
+	};
+	const clamp = (n: number) => Math.min(1, Math.max(0, n));
+	const aimOf = (m: Mover, y: number, screen: number) => {
+		if (m.kind === "page") return clamp(y / Math.max(1, document.documentElement.scrollHeight - screen));
+		if (m.kind === "top") return clamp(y / screen);
+		const from = m.top - screen; // its top is at the bottom of the screen
+		if (m.kind === "pass") return clamp((y - from) / (m.height + screen));
+		if (m.kind === "arrive") return clamp((y - from) / ((m.height + screen) / 2));
+		return clamp((y - from) / Math.max(1, Math.min(m.height, screen)));
+	};
+	let running = false;
+	let last = 0;
+	const frame = (now: number) => {
+		const ms = Math.min(50, now - last);
+		last = now;
+		const y = scrollY, screen = innerHeight;
+		let moving = false;
+		for (const m of movers) {
+			const to = aimOf(m, y, screen);
+			if (m.v === to) continue;
+			// (At the start it is where it belongs at once; near enough is there.)
+			m.v = Number.isNaN(m.v) || Math.abs(to - m.v) < 0.0003 ? to : damp(m.v, to, ms);
+			m.el.style.setProperty("--v", m.v.toFixed(4));
+			if (m.v !== to) moving = true;
+		}
+		running = moving;
+		if (moving) requestAnimationFrame(frame);
+	};
+	const follow = () => {
+		if (running) return;
+		running = true;
+		last = performance.now();
+		requestAnimationFrame(frame);
+	};
+	measure();
+	document.documentElement.classList.add("moves");
+	frame(performance.now());
+	addEventListener("scroll", follow, { passive: true });
+	// The page's height changes when its width does, and when a window of the app gets its height.
+	new ResizeObserver(() => { measure(); follow(); }).observe(document.querySelector("main") ?? document.body);
+}
+
 const POINTER = '<svg viewBox="0 0 24 24"><path d="M5 2.5v17.2l4.3-4.1 2.8 6.6 3-1.3-2.8-6.5H18L5 2.5Z"/></svg><b></b>';
 
 for (const shot of document.querySelectorAll<HTMLElement>("[data-reel]")) {
@@ -33,17 +104,18 @@ for (const shot of document.querySelectorAll<HTMLElement>("[data-reel]")) {
 	// to the side bar when it clicks there, to the panel when a diff opens, and back when it has left.
 	let point: { x: number; y: number } | undefined;
 	let talk: number | undefined;
-	let cam = NaN, camTo = NaN, camFrame = 0, camHome = 0;
+	let cam = NaN, camTo = NaN, camFrame = 0, camHome = 0, camAt = 0;
 	const room = () => Math.max(0, num(shot, "--win", 1280) - num(shot, "--wv", 1280));
 	const place = () => {
 		if (!point) return;
 		const s = num(shot, "--s", 1);
 		hand.style.transform = `translate(${(point.x - num(shot, "--xv")) * s}px, ${(point.y - num(shot, "--yv")) * s}px)`;
 	};
-	const pan = () => {
+	const pan = (now: number) => {
 		camFrame = 0;
 		const to = Math.min(room(), Math.max(0, camTo));
-		cam = Math.abs(to - cam) < 0.6 ? to : cam + (to - cam) * 0.085;
+		cam = Math.abs(to - cam) < 0.6 ? to : damp(cam, to, Math.min(50, now - camAt), 180);
+		camAt = now;
 		shot.style.setProperty("--xc", cam.toFixed(1));
 		place();
 		if (cam !== to) camFrame = requestAnimationFrame(pan);
@@ -55,7 +127,7 @@ for (const shot of document.querySelectorAll<HTMLElement>("[data-reel]")) {
 		const home = talk === undefined ? num(shot, "--xh") : talk - num(shot, "--wv", 1280) / 2;
 		if (Number.isNaN(cam)) cam = Math.min(room(), Math.max(0, home));
 		camTo = x === undefined ? home : x - num(shot, "--wv", 1280) / 2;
-		if (!camFrame) camFrame = requestAnimationFrame(pan);
+		if (!camFrame) (camAt = performance.now()), (camFrame = requestAnimationFrame(pan));
 	}
 
 	const win = shot.appendChild(Object.assign(document.createElement("div"), { className: "win" }));

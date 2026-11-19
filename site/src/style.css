@@ -184,7 +184,7 @@ main { padding-top: var(--m); }
 .stats i { font-style: normal; font-size: 11px; color: var(--dim); width: 24px; text-align: right; }
 
 .links { display: flex; justify-content: flex-end; gap: 24px; }
-.links a { transition: opacity 0.2s; }
+.links a { transition: opacity 0.25s var(--ease); }
 .links a:hover { opacity: 0.6; }
 
 .hero .shot { margin-top: calc(var(--u) * 2); }
@@ -383,7 +383,7 @@ main { padding-top: var(--m); }
 	min-height: calc(var(--u) * 28);
 	padding: 20px 24px 24px;
 	border-radius: 10px;
-	transition: transform 0.35s cubic-bezier(.2, .7, .2, 1);
+	transition: transform 0.35s var(--ease);
 }
 a.card:hover { transform: translateY(-4px); }
 .card.dark { background: var(--ink); color: var(--white); --dim: rgb(242 242 240 / 0.5); }
@@ -453,7 +453,7 @@ a.card:hover { transform: translateY(-4px); }
 	color-scheme: dark;
 	pointer-events: none;
 	opacity: 0;
-	transition: opacity 0.4s;
+	transition: opacity 0.4s var(--ease);
 }
 .win iframe.on { opacity: 1; }
 /* The window's buttons: the system draws them, so they are not in the app's page. */
@@ -468,7 +468,7 @@ a.card:hover { transform: translateY(-4px); }
 	transform-origin: 0 0;
 	background: radial-gradient(circle at 6px 6px, #ff5f57 5.5px, transparent 6px), radial-gradient(circle at 26px 6px, #febc2e 5.5px, transparent 6px), radial-gradient(circle at 46px 6px, #28c840 5.5px, transparent 6px);
 	opacity: 0;
-	transition: opacity 0.4s;
+	transition: opacity 0.4s var(--ease);
 }
 .shot.live .win::after { opacity: 1; }
 
@@ -482,7 +482,7 @@ a.card:hover { transform: translateY(-4px); }
 	height: 24px;
 	pointer-events: none;
 	opacity: 0;
-	transition: opacity 0.3s;
+	transition: opacity 0.3s var(--ease);
 	will-change: transform;
 }
 .pointer.on { opacity: 1; }
@@ -504,7 +504,7 @@ a.card:hover { transform: translateY(-4px); }
 	padding: 12px 0;
 	cursor: pointer;
 	color: var(--dim);
-	transition: color 0.3s;
+	transition: color 0.4s var(--ease);
 	background: linear-gradient(var(--line), var(--line)) 0 100% / 100% 1px no-repeat;
 }
 .show-list li:first-child { box-shadow: inset 0 1px 0 var(--line); }
@@ -514,7 +514,7 @@ a.card:hover { transform: translateY(-4px); }
    that the list is as high with one item open as with another, and what stands above it stands still. */
 .show-list { --lines: 2; }
 @media (max-width: 1023px) { .show-list { --lines: 1; } }
-.show-list li span { grid-column: 2; font-size: 13px; line-height: 18px; max-height: 0; min-height: 0; overflow: clip; opacity: 0; transition: max-height 0.5s, min-height 0.5s, opacity 0.5s, margin 0.5s; }
+.show-list li span { grid-column: 2; font-size: 13px; line-height: 18px; max-height: 0; min-height: 0; overflow: clip; opacity: 0; transition: max-height 0.45s var(--ease), min-height 0.45s var(--ease), opacity 0.45s var(--ease), margin 0.45s var(--ease); }
 .show-list li.on { color: inherit; }
 .show-list li.on span { max-height: 72px; min-height: calc(var(--lines) * 18px); opacity: 0.6; margin-top: 6px; }
 /* The sign of "run" is a letter of the font, and larger than its capitals. */
@@ -536,43 +536,39 @@ a.card:hover { transform: translateY(-4px); }
 
 /* A line over a show that says what is on. */
 .show-cap { display: grid; margin-bottom: calc(var(--u) * 2); }
-.show-cap > p { grid-area: 1 / 1; display: flex; gap: 16px; align-items: baseline; font-size: 14px; line-height: 20px; font-weight: 600; opacity: 0; transform: translateY(6px); transition: opacity 0.5s, transform 0.5s; }
+.show-cap > p { grid-area: 1 / 1; display: flex; gap: 16px; align-items: baseline; font-size: 14px; line-height: 20px; font-weight: 600; opacity: 0; transform: translateY(6px); transition: opacity 0.45s var(--ease), transform 0.45s var(--ease); }
 .show-cap > p.on { opacity: 1; transform: none; }
 .show-cap i { font: 500 11px/20px var(--mono); font-style: normal; color: var(--dim); }
 
 /* The one that plays is a bar from edge to edge of its column, and its words step in from the edge. */
-.src li { transition: background-color 0.4s, color 0.4s, padding 0.4s cubic-bezier(.2, .7, .2, 1); }
+.src li { transition: background-color 0.35s var(--ease), color 0.35s var(--ease), padding 0.35s var(--ease); }
 .src li.on { background-color: var(--ink); color: var(--light); padding-left: 12px; }
 .src li.on::before { color: inherit; opacity: 0.6; }
 
-/* ---------------------------------------------------------------- scroll
-   Driven by the browser's scroll timelines, without script. Each drift passes its place in the
-   grid when the element is in the middle of the screen. Without support, or with reduced motion,
-   everything simply stands where the grid puts it. */
+/* ---------------------------------------------------------------- motion
+   What moves with the scroll does not hang on it: main.ts gives each such element --v, how far the page has
+   come for it (0 to 1), and lets --v follow the scroll with a short damping, so a turn of the wheel is a glide
+   and not a jump. The rules here only say what --v moves. They hold under .moves, which main.ts sets on the
+   page; without script, or with reduced motion, everything stands where the grid puts it.
+   Everything else that changes (a list opening, a caption, a hover) has one curve, --ease, which starts fast
+   and settles: the same character as the damping. */
 
-@supports (animation-timeline: view()) {
-	@media (prefers-reduced-motion: no-preference) {
-		.hatch .fill { animation: grow linear both; animation-timeline: scroll(root); }
-		/* The big words slide while their panel passes the screen, and stand at their place in the grid when the
-		   panel is in the middle of it. How far each goes is --from and --to. */
-		[data-drift] { animation: slide linear both; animation-timeline: view(); }
-		.mega [data-drift] { --from: 18cqw; --to: -38cqw; }
-		.stack [data-drift] { --from: -14cqw; --to: 14cqw; }
-		.stack [data-drift="-1"] { --from: 14cqw; --to: -14cqw; }
-		.vword [data-drift] { animation-name: rise; }
-		.run[data-drift] { animation-name: run; }
-		.crop svg { animation: sink linear both; animation-timeline: scroll(root); animation-range: 0 100vh; }
-		.hero .shot, .events .shot, .layered .shot { animation: lift linear both; animation-timeline: view(); animation-range: entry 0% cover 50%; }
-		.src, .stats li { animation: rule linear both; animation-timeline: view(); animation-range: entry 0% entry 100%; }
-	}
-}
-@keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes slide { from { transform: translateX(var(--from, -6cqw)); } to { transform: translateX(var(--to, 6cqw)); } }
-@keyframes rise { from { transform: rotate(180deg) translateY(-40cqw); } to { transform: rotate(180deg) translateY(40cqw); } }
-@keyframes run { from { transform: translateX(10%); } to { transform: translateX(-55%); } }
-@keyframes sink { from { transform: translateY(0); } to { transform: translateY(18%); } }
-@keyframes lift { from { transform: translateY(32px); } to { transform: translateY(0); } }
-@keyframes rule { from { background-size: 0% 1px, 0% 1px; } to { background-size: 100% 1px, 100% 1px; } }
+:root { --ease: cubic-bezier(.2, .8, .2, 1); }
+
+.moves [data-drift], .moves .crop, .moves .shot, .moves .hatch .fill { will-change: transform; }
+.moves .hatch .fill { transform: scaleX(var(--v, 0.62)); }
+/* The big words slide while their panel passes the screen. How far each goes is --from and --to. */
+.moves [data-drift] { transform: translateX(calc(var(--from, -6cqw) + (var(--to, 6cqw) - var(--from, -6cqw)) * var(--v, 0.5))); }
+.moves .mega [data-drift] { --from: 18cqw; --to: -38cqw; }
+.moves .stack [data-drift] { --from: -14cqw; --to: 14cqw; }
+.moves .stack [data-drift="-1"] { --from: 14cqw; --to: -14cqw; }
+.moves .vword [data-drift] { transform: rotate(180deg) translateY(calc(-40cqw + 80cqw * var(--v, 0.5))); }
+/* (The line is many screens long. It goes by less than one screen's width while it passes: a drift, not a rush.) */
+.moves .run[data-drift] { --from: 4cqw; --to: -76cqw; }
+/* The mark lags a little behind the page as it leaves: the whole of it, so it stays what it is. */
+.moves .crop { transform: translateY(calc(var(--v, 0) * var(--u) * 3)); }
+.moves .hero .shot, .moves .events .shot, .moves .layered .shot { transform: translateY(calc((1 - var(--v, 1)) * var(--u) * 4)); }
+.moves .src, .moves .stats li { background-size: calc(var(--v, 1) * 100%) 1px; }
 
 /* ---------------------------------------------------------------- phone */
 
