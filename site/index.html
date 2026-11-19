@@ -10,7 +10,6 @@
 <link rel="preload" href="/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/src/style.css">
-<link rel="stylesheet" href="/src/app.css">
 <script type="module" src="/src/main.ts"></script>
 </head>
 <body>
@@ -54,16 +53,14 @@
 	</nav>
 
 	<ol class="g show-list steps" aria-label="An agent for the bills">
-		<li class="on" data-show="hero-make" style="--c: 1 / 4; --cm: 1 / 4; --cs: 1 / 3"><i>00.1</i><b>Make</b><span>You ask for an agent. You say yes.</span></li>
-		<li data-show="hero-teach" style="--c: 4 / 7; --cm: 4 / 7; --cs: 3 / 5"><i>00.2</i><b>Tell</b><span>It writes the job into its AGENTS.md.</span></li>
-		<li data-show="hero-scan" style="--c: 7 / 10; --cm: 1 / 4; --cs: 1 / 3"><i>00.3</i><b>Sleep</b><span>A letter is scanned. It reads every page.</span></li>
-		<li data-show="hero-paid" style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5"><i>00.4</i><b>Pay</b><span>Who, how much, by when. Into TODO.md.</span></li>
+		<li class="on" data-show="make" style="--c: 1 / 4; --cm: 1 / 4; --cs: 1 / 3"><i>00.1</i><b>Make</b><span>You ask for an agent. You say yes.</span></li>
+		<li data-show="tell" style="--c: 4 / 7; --cm: 4 / 7; --cs: 3 / 5"><i>00.2</i><b>Tell</b><span>It writes the job into its AGENTS.md.</span></li>
+		<li data-show="sleep" style="--c: 7 / 10; --cm: 1 / 4; --cs: 1 / 3"><i>00.3</i><b>Sleep</b><span>A letter is scanned. It reads every page.</span></li>
+		<li data-show="pay" style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5"><i>00.4</i><b>Pay</b><span>Who, how much, by when. Into TODO.md.</span></li>
 	</ol>
 
 	<div class="g">
-		<div class="shot bleed-b" style="--w: 1280; --h: 800; --ch: 640; --xs: 250; --ws: 500" data-scale data-pointer data-show-of="hero-make hero-teach hero-scan hero-paid">
-			<!--shot:hero-make-->
-		</div>
+		<div class="shot bleed-b" style="--w: 1280; --h: 720; --xs: 250; --ws: 560" data-reel="hero"></div>
 	</div>
 </section>
 
@@ -110,9 +107,7 @@
 				<p data-show="ev-system"><i>01.21</i>The Mac wakes. main says what you missed.</p>
 				<p data-show="ev-yours"><i>01.22</i>A device of your own? Hand main its protocol.</p>
 			</div>
-			<div class="shot bleed-b" style="--w: 1280; --h: 800; --x: 410; --wd: 700; --ch: 800" data-scale data-show-of="ev-mail ev-slack ev-telegram ev-discord ev-matrix ev-github ev-downloads ev-feed ev-calendar ev-fridge ev-mqtt ev-modbus ev-serial ev-syslog ev-onvif ev-smtp ev-ftp ev-stream ev-command ev-presence ev-system ev-yours">
-				<!--shot:ev-mail-->
-			</div>
+			<div class="shot bleed-b" style="--w: 720; --h: 760; --wp: 440; --hp: 620" data-reel="events" data-apart></div>
 		</div>
 	</div>
 </section>
@@ -126,9 +121,7 @@
 	</div>
 	<p class="run" data-drift aria-hidden="true"><span>08:12:04 scans/added → mrbanks</span><span>08:12:31 mqtt/message → watchdog</span><span>08:13:02 github/received → reviewer</span><span>08:13:40 syslog/line → ops</span><span>08:14:11 mail/mail → postie</span><span>08:14:58 fridge/changed → scout</span></p>
 	<div class="g">
-		<div class="shot" style="--w: 1280; --h: 800; --x: 250; --y: 512; --wd: 1030; --ch: 264; --xs: 250; --ws: 640" data-scale data-live-log>
-			<!--shot:events-log-->
-		</div>
+		<div class="shot" style="--w: 1120; --h: 380; --wp: 640; --hp: 420" data-reel="log"></div>
 	</div>
 	<div class="g meta">
 		<span style="--c: 1 / 4; --cm: 1 / 4; --cs: 1 / 3">0 polling by agents</span>
@@ -154,19 +147,17 @@
 	<div class="g layered">
 		<div class="side-note" style="--c: 1 / 3; --cm: 1 / -1">
 			<p class="h3">Talk.<br>It writes.<br>You run.</p>
-			<ol class="show-list" data-list-of="code">
-					<li class="on" data-show="code-folder"><i>02.1</i><b>Folder</b><span>Open one. The conversation works in it.</span></li>
-					<li data-show="code-branch"><i>02.2</i><b>Worktree</b><span>A branch of its own. Merge it when you like it.</span></li>
-					<li data-show="code-diff"><i>02.3</i><b>Diff</b><span>What changed, line by line, beside the talk.</span></li>
-					<li data-show="code-run"><i>02.4</i><b>Run ▶</b><span>A command in the answer runs in your terminal.</span></li>
-					<li data-show="code-steps"><i>02.5</i><b>Steps</b><span>It keeps a list, and works it off.</span></li>
-					<li data-show="code-goal"><i>02.6</i><b>Goal</b><span>It goes on until the goal is met.</span></li>
-					<li data-show="code-browser"><i>02.7</i><b>Browser</b><span>It opens the page. You see it, and can use it.</span></li>
+			<ol class="show-list">
+					<li class="on" data-show="folder"><i>02.1</i><b>Folder</b><span>Open one. The conversation works in it.</span></li>
+					<li data-show="worktree"><i>02.2</i><b>Worktree</b><span>A branch of its own. Merge it when you like it.</span></li>
+					<li data-show="diff"><i>02.3</i><b>Diff</b><span>What changed, line by line, beside the talk.</span></li>
+					<li data-show="run"><i>02.4</i><b>Run ▶</b><span>A command in the answer runs in your terminal.</span></li>
+					<li data-show="steps"><i>02.5</i><b>Steps</b><span>It keeps a list, and works it off.</span></li>
+					<li data-show="goal"><i>02.6</i><b>Goal</b><span>It goes on until the goal is met.</span></li>
+					<li data-show="browser"><i>02.7</i><b>Browser</b><span>It opens the page. You see it, and can use it.</span></li>
 				</ol>
 		</div>
-		<div class="shot bleed-r" style="--w: 1280; --h: 800; --ch: 800; --xs: 740; --ws: 540; --c: 3 / 13; --cm: 1 / -1" data-scale data-pointer data-show-of="code-folder code-branch code-diff code-run code-steps code-goal code-browser">
-			<!--shot:code-folder-->
-		</div>
+		<div class="shot bleed-r" style="--w: 1280; --h: 800; --xs: 250; --ws: 560; --c: 3 / 13; --cm: 1 / -1" data-reel="code"></div>
 	</div>
 	<div class="g pad-b"></div>
 </section>

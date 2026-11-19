@@ -3,8 +3,8 @@
 The website of [pine](https://github.com/pmndre/pine), served at pine.pmnd.re by Cloudflare Pages.
 
 The sources are in `site/` and built with Vite into the top of the repository (`index.html`,
-`assets/`, `shots/`, `fonts/`), which Pages serves as it is: the Pages project has no build step of
-its own. So the built files are committed. Build before you commit:
+`assets/`, `fonts/`, `app/reel.js`), which Pages serves as it is: the Pages project has no build
+step of its own. So the built files are committed. Build before you commit:
 
 ```bash
 npm install
@@ -14,24 +14,53 @@ npm run build    # the site, into the top of the repository
 
 | | |
 |---|---|
-| `site/index.html` | The page. `<!--shot:name-->` is replaced by that scene when it is built |
+| `site/index.html` | The page |
 | `site/src/style.css` | The grid, the type, the panels, the scroll effects |
-| `site/src/main.ts` | Scales the app's windows to their place, and runs the shows |
-| `site/src/app.css` | The Pine app's own CSS, cut down and scoped under `.pine-shot` (made by the capture) |
-| `site/public/shots/` | The scenes: the Pine app's own DOM (made by the capture) |
+| `site/src/main.ts` | Puts the app's windows in, draws the pointer, keeps the lists beside them in step |
+| `site/public/app/reel.js` | The player: what the app's page has instead of a daemon |
+| `app/` | The Pine app's page and the recordings it plays (made by the capture) |
 | `scripts/capture.mjs` | The capture |
 
 ## The windows of the app
 
-They are not pictures: `npm run capture` starts the real Pine app (from a pine checkout beside this
-one, `../pine`, with `desktop/` installed) on a pine home of its own with pine's scripted model,
-plays the scenes (a project with a worktree, a diff, the terminal, the browser; a scanned invoice, a
-pull request, a price that drops) and saves each as the app's DOM, with the CSS rules it uses. It
-needs a Mac with a screen and takes about a minute and a half. Its folders lie under /Users/Shared
-while it runs. Run it again when the app's look changes, then build.
+They are the Pine app itself. `app/index.html` is the page of pine's `desktop/`, as pine builds it,
+and each window on the site is that page in a frame of the window's size (1280 × 800), scaled to its
+place. Nothing in it is redrawn or restyled: the colours, the controls, the code pane and the
+terminal are the app's own.
 
-A window with several scenes is a show: the first scene is in the page, the others are fetched when
-it comes near the screen, and they follow one another while it is on screen.
+What the page does not have here is a daemon. The app talks to the outside through one object,
+`window.pine` (the bridge of `desktop/electron/preload.ts`), and `reel.js` is that object: it answers
+every call with what a real daemon answered when the session was recorded, sends the daemon's events
+as they came then, and does again what the owner did then: it types into the app's input and clicks
+the app's buttons. So an answer streams in, a dialog asks, a diff opens, because the app does that.
+
+```bash
+npm run capture                # every story
+npm run capture -- hero code   # some of them: hero, code, events, log
+```
+
+starts the real app (from a pine checkout beside this one, `../pine`, with `desktop/` installed) on a
+pine home of its own with pine's scripted model, plays the stories, and writes down everything that
+crosses the bridge. It writes `app/stories/<name>.json`, the pictures the daemon served into
+`app/media/`, and the app's page with the files it loads into `app/`. It needs a Mac and poppler's
+`pdftoppm`, and takes a few minutes. The app's window opens behind your windows. Its folders lie
+under /Users/Shared while it runs. Run it again when the app changes, then build.
+
+| Story | What happens in it |
+|---|---|
+| `hero` | The main agent makes an agent for the bills; the owner tells it what to watch; a letter is scanned; it is on the list |
+| `events` | 22 parts, one for each source: an event arrives in a conversation, and its agent answers |
+| `log` | The event log, which goes on without end |
+| `code` | One conversation in a folder: a worktree, a diff, the terminal, a goal with its steps, the browser |
+
+A story has checkpoints, places it can be started from: the chapters beside a window, and each
+source of the events. To watch one alone, with the player's own pointer:
+
+```
+http://localhost:5173/app/index.html#story=code&at=diff
+```
+
+What the player could not find in a recording it says in the console (`[reel] …`).
 
 ## The grid
 

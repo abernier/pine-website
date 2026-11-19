@@ -1,0 +1,1 @@
+export{default}from"./github-dark-C-LZuMrd.js";

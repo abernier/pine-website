@@ -1,6 +1,4 @@
-/* The site's resets lie under the layers of the app's CSS (src/app.css), so that inside a shot the app's own
-   rules win, and the app's rules are scoped to .pine-shot, so that they reach nothing of the site. */
-@layer site-reset, theme, base, components, utilities;
+@layer site-reset;
 
 /* ---------------------------------------------------------------- fonts */
 
@@ -402,70 +400,60 @@ a.card:hover { transform: translateY(-4px); }
 	.copy-btn { position: static; align-self: flex-start; margin-top: 8px; }
 }
 
-/* ---------------------------------------------------------------- shots of the app
-   Each shot is the Pine app's own DOM and CSS (scripts/capture.mjs), a window of --w × --h drawn at its own
-   size and scaled to the width of its place by main.ts. --x, --y and --wd say which part of the window shows,
-   --xs, --ys and --ws the same on a phone; --ch how much of its height. A shot with several scenes is a show:
-   main.ts brings one after the other. */
+/* ---------------------------------------------------------------- the windows of the app
+   Each is the Pine app's own page in a frame (main.ts), a window of --w × --h drawn at its own size and scaled
+   to the width of its place. The app lays itself out for the window it is given: a narrow one has no side bar.
+   --x, --y and --wd say which part of the window shows, and --ch how much of its height. On a phone the window
+   may be another one (--wp × --hp), or another part of it shows (--xs, --ys, --ws). */
 
 .shot {
-	--wv: var(--wd, var(--w));
-	--xv: var(--x, 0);
+	--win: var(--w);
+	--hin: var(--h);
+	--wv: var(--wd, var(--win));
+	/* (--xh: the part that shows when nothing moves it; --xc: where main.ts has moved it to, after the hand.) */
+	--xh: var(--x, 0);
+	--xv: var(--xc, var(--xh));
 	--yv: var(--y, 0);
 	position: relative;
-	aspect-ratio: var(--wv) / var(--ch, var(--h));
+	aspect-ratio: var(--wv) / var(--ch, var(--hin));
 	border-radius: 10px;
 	background: #1a1b21;
 }
-/* The window is cut by its scenes, not by the shot: the pointer may leave it. A shot without scenes cuts itself. */
-.shot:not(:has(.scene)) { overflow: clip; }
-@media (max-width: 639px) { .shot { --wv: var(--ws, var(--wd, var(--w))); --xv: var(--xs, var(--x, 0)); --yv: var(--ys, var(--y, 0)); } }
+@media (max-width: 639px) { .shot { --win: var(--wp, var(--w)); --hin: var(--hp, var(--h)); --wv: var(--ws, var(--wd, var(--win))); --xh: var(--xs, var(--x, 0)); --yv: var(--ys, var(--y, 0)); } }
 .bleed-b { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
-.scene {
-	position: absolute;
-	inset: 0;
-	overflow: clip;
-	border-radius: inherit;
-	opacity: 0;
-	visibility: hidden;
-	transition: opacity 0.7s cubic-bezier(.2, .7, .2, 1), transform 0.7s cubic-bezier(.2, .7, .2, 1), visibility 0s 0.7s;
-	transform: translateY(16px);
-}
-.scene.on { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; z-index: 1; }
-.pine-shot {
+/* The window is cut by .win, not by the shot: the pointer may leave it. */
+.win { position: absolute; inset: 0; overflow: clip; border-radius: inherit; }
+.win iframe {
 	position: absolute;
 	left: 0;
 	top: 0;
-	width: calc(var(--w) * 1px);
-	height: calc(var(--h) * 1px);
+	width: calc(var(--win) * 1px);
+	height: calc(var(--hin) * 1px);
+	border: 0;
 	transform: scale(var(--s, 1)) translate(calc(var(--xv) * -1px), calc(var(--yv) * -1px));
 	transform-origin: 0 0;
-	container: pine-window / size;
-	overflow: clip;
 	background: #1a1b21;
 	color-scheme: dark;
-	text-align: left;
 	pointer-events: none;
-	user-select: none;
+	opacity: 0;
+	transition: opacity 0.4s;
 }
-.pine-body { height: 100%; }
-/* Two things the app does live: the blur behind its questions, and a fade at the edges of what scrolls,
-   which is drawn from the scroll itself. A shot does not scroll, so its edges are not faded. */
-.pine-shot [data-slot=dialog-overlay] { backdrop-filter: blur(4px); }
-.pine-shot [class*="scroll-fade"], .pine-shot [data-slot=scroll-area-viewport] { mask-image: none !important; }
-.pine-shot * { scrollbar-width: none; }
-.pine-shot *::-webkit-scrollbar { display: none; }
-/* The window's buttons: the system draws them, so they are not in the page that was taken. */
-.pine-shot::after {
+.win iframe.on { opacity: 1; }
+/* The window's buttons: the system draws them, so they are not in the app's page. */
+.win::after {
 	content: "";
 	position: absolute;
-	left: 16px;
-	top: 16px;
+	left: 0;
+	top: 0;
 	width: 52px;
 	height: 12px;
-	z-index: 100;
+	transform: scale(var(--s, 1)) translate(calc((16 - var(--xv)) * 1px), calc((16 - var(--yv)) * 1px));
+	transform-origin: 0 0;
 	background: radial-gradient(circle at 6px 6px, #ff5f57 5.5px, transparent 6px), radial-gradient(circle at 26px 6px, #febc2e 5.5px, transparent 6px), radial-gradient(circle at 46px 6px, #28c840 5.5px, transparent 6px);
+	opacity: 0;
+	transition: opacity 0.4s;
 }
+.shot.live .win::after { opacity: 1; }
 
 /* The owner's hand: its tip is the point. It keeps its size whatever the scale of the window. */
 .pointer {
@@ -480,18 +468,14 @@ a.card:hover { transform: translateY(-4px); }
 	transition: opacity 0.3s;
 	will-change: transform;
 }
+.pointer.on { opacity: 1; }
 .pointer svg { display: block; width: 24px; height: 24px; fill: #0b0b0b; stroke: #fff; stroke-width: 1.4; stroke-linejoin: round; filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.35)); transform-origin: 5px 2.5px; }
 .pointer b { position: absolute; left: -11px; top: -13.5px; width: 32px; height: 32px; border-radius: 50%; border: 2px solid #fff; opacity: 0; }
 .pointer.click svg { animation: press 0.32s; }
 .pointer.click b { animation: ripple 0.6s ease-out; }
 @keyframes press { 40% { transform: scale(0.82); } }
 @keyframes ripple { from { opacity: 0.9; transform: scale(0.3); } to { opacity: 0; transform: scale(1.4); } }
-@media (max-width: 639px) { .pointer { display: none; } }
 @media (hover: none) { .hide-touch { display: none; } }
-
-/* A row of the live log that has just come in. */
-.pine-shot .arrive { animation: arrive 1.4s cubic-bezier(.2, .7, .2, 1); }
-@keyframes arrive { from { opacity: 0; transform: translateY(8px); background-color: rgb(255 255 255 / 0.16); } 40% { opacity: 1; transform: none; } to { background-color: transparent; } }
 
 /* The list beside a show: which scene is on, and how long it has left. */
 .show-list { display: flex; flex-direction: column; }

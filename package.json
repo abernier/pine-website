@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "rm -rf assets shots fonts && vite build",
+    "build": "rm -rf assets fonts && vite build",
     "capture": "node scripts/capture.mjs",
     "preview": "vite preview"
   },
