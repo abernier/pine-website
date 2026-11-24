@@ -546,26 +546,47 @@ a.card:hover { transform: translateY(-4px); }
 .src li.on::before { color: inherit; opacity: 0.6; }
 
 /* ---------------------------------------------------------------- motion
-   What moves with the scroll does not hang on it: main.ts gives each such element --v, how far the page has
-   come for it (0 to 1), and lets --v follow the scroll with a short damping, so a turn of the wheel is a glide
-   and not a jump. The rules here only say what --v moves. They hold under .moves, which main.ts sets on the
-   page; without script, or with reduced motion, everything stands where the grid puts it.
+   What moves with the scroll is tied to the scroll itself: a scroll-driven animation, which the browser runs
+   beside the scrolling, on the same frame, whatever the page's script and the app's windows are busy with.
+   (A script that follows the scroll draws a frame after the page has moved, and that shows as a stutter.)
+   It holds under .scrolls, which main.ts sets where the browser has scroll timelines and motion is welcome.
+   Elsewhere main.ts gives each such element --v, how far the page has come for it (0 to 1), under .moves.
+   Without script, or with reduced motion, everything stands where the grid puts it.
    Everything else that changes (a list opening, a caption, a hover) has one curve, --ease, which starts fast
-   and settles: the same character as the damping. */
+   and settles. */
 
 :root { --ease: cubic-bezier(.2, .8, .2, 1); }
 
-.moves [data-drift], .moves .crop, .moves .shot, .moves .hatch .fill { will-change: transform; }
-.moves .hatch .fill { transform: scaleX(var(--v, 0.62)); }
-/* The big words slide while their panel passes the screen. How far each goes is --from and --to. */
-.moves [data-drift] { transform: translateX(calc(var(--from, -6cqw) + (var(--to, 6cqw) - var(--from, -6cqw)) * var(--v, 0.5))); }
-.moves .mega [data-drift] { --from: 18cqw; --to: -38cqw; }
-.moves .stack [data-drift] { --from: -14cqw; --to: 14cqw; }
-.moves .stack [data-drift="-1"] { --from: 14cqw; --to: -14cqw; }
-.moves .vword [data-drift] { transform: rotate(180deg) translateY(calc(-40cqw + 80cqw * var(--v, 0.5))); }
+/* How far the big words go while their panel passes the screen: --from and --to. */
+.mega [data-drift] { --from: 18cqw; --to: -38cqw; }
+.stack [data-drift] { --from: -14cqw; --to: 14cqw; }
+.stack [data-drift="-1"] { --from: 14cqw; --to: -14cqw; }
 /* (The line is many screens long. It goes by less than one screen's width while it passes: a drift, not a rush.) */
-.moves .run[data-drift] { --from: 4cqw; --to: -76cqw; }
-/* The mark lags a little behind the page as it leaves: the whole of it, so it stays what it is. */
+.run[data-drift] { --from: 4cqw; --to: -76cqw; }
+
+:is(.moves, .scrolls) :is([data-drift], .crop, .shot, .hatch .fill) { will-change: transform; }
+
+/* The bar under the mark: the whole page. */
+.scrolls .hatch .fill { animation: fill linear both; animation-timeline: scroll(root); }
+@keyframes fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+/* The big words slide while they pass the screen, from coming in at the bottom to leaving at the top. */
+.scrolls [data-drift] { animation: drift linear both; animation-timeline: view(); animation-range: cover; }
+@keyframes drift { from { transform: translateX(var(--from, -6cqw)); } to { transform: translateX(var(--to, 6cqw)); } }
+.scrolls .vword [data-drift] { animation-name: rise; }
+@keyframes rise { from { transform: rotate(180deg) translateY(-40cqw); } to { transform: rotate(180deg) translateY(40cqw); } }
+/* The mark lags a little behind the page as it leaves, over the first screen: the whole of it, so it stays what it is. */
+.scrolls .crop { animation: lag linear both; animation-timeline: scroll(root); animation-range: 0 100vh; }
+@keyframes lag { to { transform: translateY(calc(var(--u) * 3)); } }
+/* A window rises into place as it comes in, until it stands in the middle of the screen. */
+.scrolls :is(.hero, .events, .layered) .shot { animation: arrive linear both; animation-timeline: view(); animation-range: cover 0% cover 50%; }
+@keyframes arrive { from { transform: translateY(calc(var(--u) * 4)); } to { transform: none; } }
+/* A list's rules draw themselves while it comes in. */
+.scrolls :is(.src, .stats li) { animation: rule linear both; animation-timeline: view(); animation-range: entry; }
+@keyframes rule { from { background-size: 0% 1px; } to { background-size: 100% 1px; } }
+
+.moves .hatch .fill { transform: scaleX(var(--v, 0.62)); }
+.moves [data-drift] { transform: translateX(calc(var(--from, -6cqw) + (var(--to, 6cqw) - var(--from, -6cqw)) * var(--v, 0.5))); }
+.moves .vword [data-drift] { transform: rotate(180deg) translateY(calc(-40cqw + 80cqw * var(--v, 0.5))); }
 .moves .crop { transform: translateY(calc(var(--v, 0) * var(--u) * 3)); }
 .moves .hero .shot, .moves .events .shot, .moves .layered .shot { transform: translateY(calc((1 - var(--v, 1)) * var(--u) * 4)); }
 .moves .src, .moves .stats li { background-size: calc(var(--v, 1) * 100%) 1px; }

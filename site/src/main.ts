@@ -17,8 +17,9 @@ const damp = (from: number, to: number, ms: number, tau = TAU) => to + (from - t
 
 // ---- what moves with the scroll ----------------------------------------------------------------------
 //
-// Each such element has --v, how far the page has come for it, from 0 to 1 (style.css says what that moves).
-// --v does not jump to where the scroll is: it follows it, damped, so the wheel's steps come out as one glide.
+// Where the browser has scroll timelines, the browser moves them itself, on the frame the page scrolls on
+// (style.css, under .scrolls). Elsewhere each such element gets --v here, how far the page has come for it,
+// from 0 to 1, set on every frame the page scrolls on, and style.css says what that moves (under .moves).
 
 /** Which elements, and what their 0 and 1 are. */
 const FOLLOW: Array<[string, "page" | "top" | "pass" | "arrive" | "enter"]> = [
@@ -28,7 +29,9 @@ const FOLLOW: Array<[string, "page" | "top" | "pass" | "arrive" | "enter"]> = [
 	[".hero .shot, .events .shot, .layered .shot", "arrive"], // from coming in to standing in the middle
 	[".src, .stats li", "enter"], // while it comes in
 ];
-if (!still.matches) {
+const timelines = CSS.supports("animation-timeline: view()") && CSS.supports("animation-range: cover");
+if (!still.matches && timelines) document.documentElement.classList.add("scrolls");
+else if (!still.matches) {
 	type Mover = { el: HTMLElement; kind: (typeof FOLLOW)[number][1]; top: number; height: number; v: number };
 	const movers: Mover[] = FOLLOW.flatMap(([sel, kind]) => [...document.querySelectorAll<HTMLElement>(sel)].map((el) => ({ el, kind, top: 0, height: 0, v: NaN })));
 	/** Where an element stands on the page, as the layout has it: what moves it (a transform) does not count. */
@@ -49,33 +52,23 @@ if (!still.matches) {
 		if (m.kind === "arrive") return clamp((y - from) / ((m.height + screen) / 2));
 		return clamp((y - from) / Math.max(1, Math.min(m.height, screen)));
 	};
-	let running = false;
-	let last = 0;
-	const frame = (now: number) => {
-		const ms = Math.min(50, now - last);
-		last = now;
+	let queued = false;
+	const frame = () => {
+		queued = false;
 		const y = scrollY, screen = innerHeight;
-		let moving = false;
 		for (const m of movers) {
-			const to = aimOf(m, y, screen);
-			if (m.v === to) continue;
-			// (At the start it is where it belongs at once; near enough is there.)
-			m.v = Number.isNaN(m.v) || Math.abs(to - m.v) < 0.0003 ? to : damp(m.v, to, ms);
-			m.el.style.setProperty("--v", m.v.toFixed(4));
-			if (m.v !== to) moving = true;
+			const v = aimOf(m, y, screen);
+			if (Math.abs(v - m.v) < 0.0001) continue;
+			m.v = v;
+			m.el.style.setProperty("--v", v.toFixed(4));
 		}
-		running = moving;
-		if (moving) requestAnimationFrame(frame);
 	};
 	const follow = () => {
-		if (running) return;
-		running = true;
-		last = performance.now();
-		requestAnimationFrame(frame);
+		if (!queued) (queued = true), requestAnimationFrame(frame);
 	};
 	measure();
 	document.documentElement.classList.add("moves");
-	frame(performance.now());
+	frame();
 	addEventListener("scroll", follow, { passive: true });
 	// The page's height changes when its width does, and when a window of the app gets its height.
 	new ResizeObserver(() => { measure(); follow(); }).observe(document.querySelector("main") ?? document.body);
