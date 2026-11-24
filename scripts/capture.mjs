@@ -31,6 +31,9 @@ const desktop = path.join(pine, "desktop");
 const { _electron: electron } = await import(path.join(pine, "node_modules", "playwright-core", "index.mjs"));
 const { startMock, textOf } = await import(path.join(pine, "baseline", "tests", "mock.mjs"));
 
+const checkoutVersion = JSON.parse(fs.readFileSync(path.join(pine, "package.json"), "utf8")).version;
+/** The newest release's version: its tag on main (a preview's tag says -next). */
+const released = execFileSync("git", ["-C", pine, "tag", "--list", "v*", "--sort=-v:refname"], { encoding: "utf8" }).split("\n").find((t) => /^v\d+\.\d+\.\d+$/.test(t))?.slice(1) ?? checkoutVersion;
 const out = path.join(site, "app");
 const debug = path.join(site, ".capture");
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -573,6 +576,9 @@ function finish({ feed = false } = {}) {
 	// Nothing of the person who made the recording is in it.
 	const me = os.userInfo();
 	for (const [what, as] of [[me.homedir, "/Users/you"], [os.hostname(), "mac"], [os.hostname().replace(/\.local$/, ""), "mac"]]) if (what && what.length > 2) text = text.replaceAll(what, as);
+	// A checkout's package.json keeps a version pine never bumps (releases take theirs from the commits):
+	// the windows say the version of pine's latest release instead.
+	text = text.replaceAll(`"version":${JSON.stringify(checkoutVersion)}`, `"version":${JSON.stringify(released)}`);
 	// (The user's name alone may be a word like any other: it counts where it stands for the user, before an @.)
 	const mine = [`${me.username}@`, ...["user.name", "user.email"].map((k) => { try { return execFileSync("git", ["config", "--global", k], { encoding: "utf8" }).trim(); } catch { return ""; } })].filter((x) => x && x.length > 2);
 	for (const x of mine) if (text.includes(x)) throw new Error(`${story}: the recording names you (${JSON.stringify(x)}), here: …${text.slice(Math.max(0, text.indexOf(x) - 160), text.indexOf(x) + 80)}…`);
@@ -621,7 +627,7 @@ async function hero() {
 	s.teach[1].tools[0].args.edits = [{ oldText: lastLine, newText: `${lastLine}\n## Scans\n\nThe scanner puts letters into ~/Documents/scans. For each new one:\n- say in one line what it is and who sent it\n- the payment details: payee, IBAN, amount, due date, reference\n- a line in TODO.md, with the amount and the date\n` }];
 
 	await checkpoint("tell");
-	await click({ sel: '[aria-label="Conversations with mrbanks"] [title^="mrbanks · main"]' });
+	await click({ sel: "[data-slot=agent-conversation]:has([data-agent=mrbanks])" });
 	await sees('[data-slot=tab][data-active] >> text=mrbanks');
 	await quiet();
 	await tell("watch ~/Documents/scans. for each letter: what it is, the payment details, a line in TODO.md");
@@ -642,7 +648,7 @@ async function hero() {
 	const DIFF = [{ do: "menu", command: "code-changes" }, { do: "click", sel: `${PANEL} [role=option]`, text: "AGENTS\\.md" }];
 	await checkpoint("wake", DIFF);
 	hold(900);
-	fs.copyFileSync(path.join(pine, "reel", "bill", "water-bill.pdf"), path.join(scans, "water-bill.pdf"));
+	fs.copyFileSync(path.join(import.meta.dirname, "water-bill.pdf"), path.join(scans, "water-bill.pdf"));
 	await page.waitForFunction(() => document.querySelectorAll("[data-slot=message-scroller-content] img").length >= 2, undefined, { timeout: 60_000 });
 	await pictures();
 	// The model takes its time before it writes the line (s.bill): the chapter turns in that pause.
