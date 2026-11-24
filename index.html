@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>pine</title>
-<meta name="description" content="pine: a reactive event harness for LLMs. Agents that wake up when something happens, and write code with you.">
+<meta name="description" content="Pine: a new harness for reactive agents. Agents persist, work autonomously, and react to events from anything: mail, chat, sensors, cameras, feeds.">
 <meta name="theme-color" content="#c4c4c1">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
@@ -35,8 +35,8 @@
 
 	<div class="g lead">
 		<div class="claim" style="--c: 1 / 6; --cm: 1 / 5">
-			<p class="h1">Agents that<br>wake up.</p>
-			<p class="small dim">When something happens, an agent goes to work.<br>When you write to it, it writes code.</p>
+			<p class="h1">A new harness for<br>reactive agents.</p>
+			<p class="small dim">In Pine, agents can do more than chat and code.<br>Agents persist, and work autonomously.</p>
 		</div>
 		<ul class="stats" style="--c: 7 / 13; --cm: 1 / -1">
 			<li><svg class="ico ico-ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11"/><path d="M8 12h8M12 8v8"/></svg><span><em>Event sources</em><b>21</b></span><i>01</i></li>
@@ -56,7 +56,7 @@
 		<li class="on" data-show="make" style="--c: 1 / 4; --cm: 1 / 4; --cs: 1 / 3"><i>00.1</i><b>Make</b><span>You ask main for an agent, and allow it.</span></li>
 		<li data-show="tell" style="--c: 4 / 7; --cm: 4 / 7; --cs: 3 / 5"><i>00.2</i><b>Tell</b><span>You say what to watch. It writes that into its AGENTS.md.</span></li>
 		<li data-show="wake" style="--c: 7 / 10; --cm: 1 / 4; --cs: 1 / 3"><i>00.3</i><b>Wake</b><span>A letter is scanned. The agent wakes and reads both pages.</span></li>
-		<li data-show="due" style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5"><i>00.4</i><b>Due</b><span>Whom to pay, how much, by when: a line in TODO.md.</span></li>
+		<li data-show="due" style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5"><i>00.4</i><b>Respond</b><span>Whom to pay, how much, by when: a line in TODO.md.</span></li>
 	</ol>
 
 	<div class="g">
@@ -78,9 +78,9 @@
 	<div class="g body">
 		<p class="vword" aria-hidden="true" style="--c: 1 / 4"><span data-drift>Listen</span></p>
 		<div class="copy" style="--c: 4 / 8; --cm: 1 / -1">
-			<h2 id="events-h" class="h2">Something happens.<br>An agent wakes.</h2>
+			<h2 id="events-h" class="h2">Pine is driven<br>by events.</h2>
 			<ol class="src" data-hover><li data-show="ev-mail">Mail</li><li data-show="ev-slack">Slack</li><li data-show="ev-telegram">Telegram</li><li data-show="ev-discord">Discord</li><li data-show="ev-matrix">Matrix</li><li data-show="ev-github">Webhook</li><li data-show="ev-downloads">Folder</li><li data-show="ev-feed">Feed</li><li data-show="ev-calendar">Calendar</li><li data-show="ev-fridge">HTTP</li><li data-show="ev-mqtt">MQTT</li><li data-show="ev-modbus">Modbus</li><li data-show="ev-serial">Serial</li><li data-show="ev-syslog">Syslog</li><li data-show="ev-onvif">ONVIF</li><li data-show="ev-smtp">SMTP</li><li data-show="ev-ftp">FTP</li><li data-show="ev-stream">Stream</li><li data-show="ev-command">Command</li><li data-show="ev-presence">Presence</li><li data-show="ev-system">System</li><li data-show="ev-yours" class="yours">Yours</li></ol>
-			<p class="small">A letter in a folder, a message in a channel, a sensor, a camera, a feed, a clock. Each is a source. An agent subscribes to one, and sleeps until it reports something. <span class="dim hide-touch">Point at one.</span></p>
+			<p class="small">Pine is built on an event bus. Agents can react to <i>anything</i>, over any digital protocol, and act on whatever instructions they're given.</p>
 		</div>
 		<div class="stage" style="--c: 8 / 13; --cm: 2 / 6; --cs: 1 / -1">
 			<div class="show-cap" aria-live="polite">
