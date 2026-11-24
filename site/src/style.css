@@ -559,6 +559,8 @@ a.card:hover { transform: translateY(-4px); }
 
 /* How far the big words go while their panel passes the screen: --from and --to. */
 .mega [data-drift] { --from: 18cqw; --to: -38cqw; }
+/* (The swarm's word comes in from the other side than the code's just above it.) */
+.swarm .mega [data-drift] { --from: -38cqw; --to: 18cqw; }
 .stack [data-drift] { --from: -14cqw; --to: 14cqw; }
 .stack [data-drift="-1"] { --from: 14cqw; --to: -14cqw; }
 /* (The line is many screens long. It goes by less than one screen's width while it passes: a drift, not a rush.) */

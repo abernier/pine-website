@@ -18,6 +18,8 @@ npm run build    # the site, into the top of the repository
 | `site/src/style.css` | The grid, the type, the panels, the scroll effects |
 | `site/src/main.ts` | Puts the app's windows in, draws the pointer, keeps the lists beside them in step |
 | `site/public/app/reel.js` | The player: what the app's page has instead of a daemon |
+| `site/public/app/view-clock.js` | The recording's clock for the frame the app's view panel runs a view in |
+| `site/public/_headers` | CORS for the app's scripts: the view's frame is sandboxed, so it loads them cross-origin |
 | `app/` | The Pine app's page and the recordings it plays (made by the capture) |
 | `scripts/capture.mjs` | The capture |
 
@@ -36,7 +38,7 @@ the app's buttons. So an answer streams in, a dialog asks, a diff opens, because
 
 ```bash
 npm run capture                # every story
-npm run capture -- hero code   # some of them: hero, code, events, log
+npm run capture -- hero code   # some of them: hero, code, events, log, swarm
 ```
 
 starts the real app (from a pine checkout beside this one, `../pine`, with `desktop/` installed) on a
@@ -52,6 +54,7 @@ under /Users/Shared while it runs. Run it again when the app changes, then build
 | `events` | 22 parts, one for each source: an event arrives in a conversation, and its agent answers |
 | `log` | The event log, which goes on without end |
 | `code` | One conversation in a folder: a worktree, a diff, the terminal, a goal with its steps, the browser |
+| `swarm` | `/swarm` on the shop: main hands a translation into 12 languages to 12 sub-agents at once on one board, the overview shows them and three other agents that events wake meanwhile, and a sub-agent that did none of it checks the answer |
 
 A story has checkpoints, places it can be started from: the chapters beside a window, and each
 source of the events. To watch one alone, with the player's own pointer:

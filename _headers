@@ -1,0 +1,4 @@
+# The app's view panel runs a view in a sandboxed frame, whose origin is nobody's: the module scripts it
+# loads from here are fetched cross-origin, and need this to load at all.
+/app/assets/*
+  Access-Control-Allow-Origin: *

@@ -51,6 +51,11 @@
 		static now() { return Math.round(epoch + clock.now()); }
 	}
 	window.Date = ReelDate;
+	// The view panel runs a view in a frame of its own, which has a clock of its own: it is told this one's
+	// time, a few times a second (view-clock.js, which the capture puts into the frame's page).
+	setInterval(() => {
+		for (const f of document.querySelectorAll("iframe[data-slot=view-frame]")) f.contentWindow?.postMessage({ reelNow: ReelDate.now() }, "*");
+	}, 200);
 
 	// What the app keeps in the browser (which list is folded, how wide a panel is) is this window's alone.
 	const kept = new Map();
@@ -139,6 +144,13 @@
 		if (method === "POST" && url === "/ui/tabs") return { ok: true, status: 200, data: { ok: true } };
 		if (method === "GET" && url === "/ui/tabs") return { ok: true, status: 200, data: structuredClone(last(S.tabs, t) ?? { tabs: [], active: 0, code: false }) };
 		const list = S.calls[`${method} ${url}`];
+		// What the hand does in the agent's browser (a click, keys) is answered by the daemon with the browser as it
+		// is then, which the panel takes for its state: here that is the browser as the recording had it by now.
+		const into = !list && method === "POST" && /^\/agents\/([^/]+)\/browser\/input$/.exec(url);
+		if (into) {
+			const seen = Object.keys(S.calls).find((k) => k.startsWith(`GET /agents/${into[1]}/browser?`));
+			if (seen) return structuredClone(S.pool[nearest(S.calls[seen], t)]);
+		}
 		if (!list) {
 			if (!missed.has(`${method} ${url}`)) (missed.add(`${method} ${url}`), console.warn("[reel] not in the recording:", method, url));
 			return method === "POST" ? { ok: true, status: 200, data: {} } : { ok: false, status: 404, data: { error: "not found" } };

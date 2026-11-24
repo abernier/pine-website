@@ -40,5 +40,11 @@
 		"main-BwTnAhBi.css",
 		"modulepreload-polyfill-DHZR_UKa.js",
 		"shellscript-BTYUSYjN.js"
+	],
+	"swarm": [
+		"main-3V8jiesk.js",
+		"main-BwTnAhBi.css",
+		"modulepreload-polyfill-DHZR_UKa.js",
+		"view-Bxyyatuw.js"
 	]
 }

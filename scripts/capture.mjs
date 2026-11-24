@@ -23,7 +23,7 @@ import path from "node:path";
 
 const site = path.resolve(import.meta.dirname, "..");
 const argv = process.argv.slice(2);
-const SECTIONS = ["hero", "code", "events", "log"];
+const SECTIONS = ["hero", "code", "events", "log", "swarm"];
 const wanted = argv.filter((a) => SECTIONS.includes(a));
 const sections = wanted.length ? wanted : SECTIONS;
 const pine = path.resolve(argv.find((a) => !a.startsWith("-") && !SECTIONS.includes(a)) ?? path.join(site, "..", "pine"));
@@ -206,11 +206,11 @@ s.teach = [
 	{ text: "Watching `~/Documents/scans`. The job is in my `AGENTS.md`, so I know it whenever I wake." },
 ];
 s.bill = [
-	{ tools: [{ name: "bash", args: { command: `mkdir -p pages && pdftoppm -r 40 -png ${scans}/water-bill.pdf pages/water-bill` } }], delayMs: 900 },
-	{ tools: [{ name: "read", args: { path: "pages/water-bill-1.png" } }, { name: "read", args: { path: "pages/water-bill-2.png" } }], delayMs: 900 },
+	{ tools: [{ name: "bash", args: { command: `mkdir -p pages && pdftoppm -r 40 -png ${scans}/water-bill.pdf pages/water-bill` } }], delayMs: 400 },
+	{ tools: [{ name: "read", args: { path: "pages/water-bill-1.png" } }, { name: "read", args: { path: "pages/water-bill-2.png" } }], delayMs: 400 },
 	// The pause before this one is where the chapter turns (see hero()).
 	{ tools: [{ name: "edit", args: { path: "TODO.md", edits: [{ oldText: "- [ ] Dentist: €86.40 by 4 Dec · ref R-2026-0912\n", newText: "- [ ] Dentist: €86.40 by 4 Dec · ref R-2026-0912\n- [ ] Water, Stadtwerke Musterstadt: €219.41 by 26 Nov · ref WA-2026-104233\n      IBAN DE89 3704 0044 0532 0130 00\n" }] } }], delayMs: 3500 },
-	{ text: "A **water bill**, 2 pages.\n\n| To pay | |\n|---|---|\n| Payee | Stadtwerke Musterstadt GmbH |\n| IBAN | DE89 3704 0044 0532 0130 00 |\n| BIC | COBADEFFXXX |\n| Amount | **€219.41** |\n| Due | 26 Nov 2026 |\n| Reference | WA-2026-104233 |\n\nThe prepayment goes up to **€49.00** a month from 15 Dec. Added to `TODO.md`." },
+	{ text: "A **water bill**, 2 pages.\n\n| To pay | |\n|---|---|\n| Payee | Stadtwerke Musterstadt GmbH |\n| IBAN | DE89 3704 0044 0532 0130 00 |\n| BIC | COBADEFFXXX |\n| Amount | **€219.41** |\n| Due | 26 Nov 2026 |\n| Reference | WA-2026-104233 |\n\nThe prepayment goes up to **€49.00** a month from 15 Dec. Added to `TODO.md`.", chunkDelayMs: 35 },
 ];
 s.checkout = [
 	{ tools: [{ name: "read", args: { path: "src/cart.ts" } }] },
@@ -265,6 +265,43 @@ s.lease = [
 ];
 s.yours = [{ text: "No problem. I'll study `protocol.pdf` and add a source for it, unless one of the types we have covers it already: a heat pump often speaks Modbus, and that one is there." }];
 for (const e of EVENTS) if (e.said) s[`ev_${e.key}`] = e.said;
+// The swarm: the shop's words in twelve languages, a sub-agent for each, side by side on one board.
+const EN = { "cart.title": "Your cart", "cart.empty": "Your cart is empty.", "cart.add": "Add to cart", "cart.count": "{count} items", "cart.total": "Total", "checkout.title": "Checkout", "checkout.pay": "Pay now", "checkout.coupon": "Coupon code", "checkout.thanks": "Thank you for your order!" };
+const LANGUAGES = [
+	["de", "German", ["Dein Warenkorb", "Dein Warenkorb ist leer.", "In den Warenkorb", "{count} Artikel", "Summe", "Kasse", "Jetzt bezahlen", "Gutscheincode", "Danke für deine Bestellung!"]],
+	["fr", "French", ["Ton panier", "Ton panier est vide.", "Ajouter au panier", "{count} articles", "Total", "Paiement", "Payer maintenant", "Code promo", "Merci pour ta commande !"]],
+	["es", "Spanish", ["Tu carrito", "Tu carrito está vacío.", "Añadir al carrito", "{count} artículos", "Total", "Pago", "Pagar ahora", "Código de descuento", "¡Gracias por tu pedido!"]],
+	["it", "Italian", ["Il tuo carrello", "Il tuo carrello è vuoto.", "Aggiungi al carrello", "{count} articoli", "Totale", "Cassa", "Paga ora", "Codice sconto", "Grazie per il tuo ordine!"]],
+	["nl", "Dutch", ["Je winkelwagen", "Je winkelwagen is leeg.", "In winkelwagen", "{count} artikelen", "Totaal", "Afrekenen", "Nu betalen", "Kortingscode", "Bedankt voor je bestelling!"]],
+	["pl", "Polish", ["Twój koszyk", "Twój koszyk jest pusty.", "Dodaj do koszyka", "Produkty: {count}", "Suma", "Kasa", "Zapłać teraz", "Kod rabatowy", "Dziękujemy za zamówienie!"]],
+	["pt", "Portuguese", ["O seu carrinho", "O seu carrinho está vazio.", "Adicionar ao carrinho", "{count} artigos", "Total", "Finalizar compra", "Pagar agora", "Código de desconto", "Obrigado pela sua encomenda!"]],
+	["sv", "Swedish", ["Din varukorg", "Din varukorg är tom.", "Lägg i varukorgen", "{count} varor", "Totalt", "Kassa", "Betala nu", "Rabattkod", "Tack för din beställning!"]],
+	["cs", "Czech", ["Váš košík", "Váš košík je prázdný.", "Přidat do košíku", "Položky: {count}", "Celkem", "Pokladna", "Zaplatit", "Slevový kód", "Děkujeme za objednávku!"]],
+	["tr", "Turkish", ["Sepetiniz", "Sepetiniz boş.", "Sepete ekle", "{count} ürün", "Toplam", "Ödeme", "Şimdi öde", "İndirim kodu", "Siparişiniz için teşekkürler!"]],
+	["ja", "Japanese", ["カート", "カートは空です。", "カートに入れる", "{count}点", "合計", "ご購入手続き", "今すぐ支払う", "クーポンコード", "ご注文ありがとうございます！"]],
+	["ko", "Korean", ["장바구니", "장바구니가 비어 있습니다.", "장바구니에 담기", "상품 {count}개", "합계", "결제", "지금 결제", "쿠폰 코드", "주문해 주셔서 감사합니다!"]],
+];
+const SWARM_JOB = "translate the shop into 12 languages: a file locales/<code>.json for each, from locales/en.json";
+const taskOf = ([code, name]) => `Translate locales/en.json into ${name} (${code}): write locales/${code}.json.`;
+s.lead = [
+	{ tools: [{ name: "read", args: { path: "locales/en.json" } }] },
+	{ tools: [{ name: "subagent", args: { tasks: LANGUAGES.map(taskOf), note: "The keys stay as they are, in the order of en.json; only the values are translated. {count} stays exactly as it is, where the language puts the number. Talk to the customer the way shops in that language do: informal in German, French, Spanish, Italian, Dutch and Swedish, polite in the others. UTF-8, two spaces of indent." } }] },
+	{ text: `The shop speaks **13 languages** now. Each file has the 9 keys of \`en.json\`, in its order, and \`{count}\` in every one.\n\n| Language | File |\n|---|---|\n${LANGUAGES.map(([code, name]) => `| ${name} | \`locales/${code}.json\` |`).join("\n")}`, chunkDelayMs: 25 },
+];
+// Each sub-agent takes its own time, so that they finish one by one and not all at once.
+const SLOW = { de: 5200, fr: 6400, es: 4600, it: 7800, nl: 5800, pl: 8600, pt: 6900, sv: 4300, cs: 9400, tr: 7300, ja: 10200, ko: 8100 };
+for (const [code, name, words] of LANGUAGES) {
+	const json = `{\n${Object.keys(EN).map((k, i) => `  ${JSON.stringify(k)}: ${JSON.stringify(words[i])}`).join(",\n")}\n}\n`;
+	s[`tr_${code}`] = [
+		{ tools: [{ name: "read", args: { path: "locales/en.json" } }], delayMs: 500 + (SLOW[code] % 7) * 120 },
+		{ tools: [{ name: "write", args: { path: `locales/${code}.json`, content: json } }], delayMs: SLOW[code] },
+		{ text: `${name}: \`locales/${code}.json\`, 9 keys, \`{count}\` kept.`, chunkDelayMs: 40 },
+	];
+}
+s.swarmCheck = [
+	{ tools: [{ name: "bash", args: { command: `node -e 'const fs=require("fs"),read=(f)=>JSON.parse(fs.readFileSync("locales/"+f,"utf8")),en=Object.keys(read("en.json")).join();for(const f of fs.readdirSync("locales").sort()){const t=read(f);console.log(f.padEnd(8),Object.keys(t).join()===en?"same keys":"KEYS DIFFER",t["cart.count"].includes("{count}")?"{count}":"NO {count}")}'` } }] },
+	{ text: "All 12 files are there, each with the 9 keys of `en.json` in its order, and `{count}` in every one. The table names each of them once.\n\nPASS" },
+];
 // The pace of the model: a moment before each tool call, and words that come as words do.
 for (const script of Object.values(s)) for (const step of script) {
 	if (step.tools) step.delayMs ??= 650;
@@ -273,6 +310,9 @@ for (const script of Object.values(s)) for (const step of script) {
 
 /** Which script a request is for, by what its last message says. The message itself stays as it came. */
 const MEANS = [
+	[/^Check the answer below before the one who asked for it relies on it/, "swarmCheck"],
+	[/^translate the shop into 12 languages/, "lead"],
+	...LANGUAGES.map(([code, name]) => [new RegExp(`^Translate locales/en\\.json into ${name} \\(${code}\\)`), `tr_${code}`]),
 	[/^new agent: mrbanks/, "make"], [/^watch ~\/Documents\/scans/, "teach"], [/water-bill\.pdf/, "bill"],
 	[/^build the checkout page/, "checkout"], [/^add Apple Pay/, "applepay"], [/^the deploy needs my Stripe key/, "secret"], [/ran a command from your answer/, "ran"], [/^open the checkout/, "browser"],
 	// The goal's first round is asked in other words than the rounds after it.
@@ -341,7 +381,9 @@ async function pineHome() {
 	apiPort = await freePort();
 	write(path.join(home, "models.json"), JSON.stringify({ providers: { local: { name: "Local", baseUrl: modelUrl, api: "openai-completions", apiKey: "sk-none", models: [{ id: "qwen3-coder", name: "qwen3-coder", contextWindow: 128000, maxTokens: 4096, input: ["text", "image"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } }] } } }));
 	write(path.join(home, "pine.json"), JSON.stringify({
-		http: { host: "127.0.0.1", port: apiPort }, main: "main", defaults: { model: "local/qwen3-coder", mode: "auto" }, security: { askAccess: false }, mcp: { browser: { pine: "browser" } },
+		http: { host: "127.0.0.1", port: apiPort }, main: "main", defaults: { model: "local/qwen3-coder", mode: "auto" }, security: { askAccess: false },
+		// The swarm's dozen sub-agents at once, and the agents that events wake meanwhile.
+		limits: { maxConcurrentRuns: 24, maxSubagents: 12 }, mcp: { browser: { pine: "browser" } },
 		sources: {
 			github: { type: "webhook", open: true, description: "pull requests of example/shop" },
 			fridge: { type: "http", url: `http://127.0.0.1:${pagePort}/fridge-3000`, match: "Price: ([0-9.,]+)", every: "1s", description: "the price of the Fridge 3000" },
@@ -455,8 +497,9 @@ const end = () => note("mark", { end: true });
  * of this moment are in the recording. `setup` is what brings a window that was just opened to what the
  * window in the recording shows by now (which view of the side panel, which file).
  */
-async function checkpoint(name, setup = []) {
-	await quiet();
+async function checkpoint(name, setup = [], { busy = false } = {}) {
+	// (While a swarm works nothing is ever quiet: such a checkpoint is taken as things are.)
+	if (!busy) await quiet();
 	const urls = [...new Set(R.filter((e) => e.k === "invoke" && e.ch === "pine:call" && e.a[0] === "GET").map((e) => e.a[1]))];
 	await page.evaluate(async (list) => { await Promise.all(list.map((u) => window.pine.call("GET", u).catch(() => undefined))); }, urls);
 	await drain();
@@ -614,7 +657,7 @@ async function hero() {
 	await click(ALLOW);
 	await said(/tell it what to watch/);
 	await quiet();
-	hold(1400);
+	hold(500);
 
 	// Between the chapters, behind the window: the new agent's folder gets a list and a history, so that changes show.
 	const desk = path.join(home, "agents", "mrbanks", "workspace");
@@ -635,31 +678,25 @@ async function hero() {
 	await click(ALLOW);
 	await said(/whenever I wake/);
 	await quiet();
-	hold(700);
-	// What it wrote into its own instructions, beside the conversation.
-	await click({ sel: "[data-toggle=code]" });
-	await click({ sel: `${PANEL} [role=tab]`, text: "^Changes$" });
-	await click({ sel: `${PANEL} [role=option]`, text: "AGENTS\\.md" });
-	await quiet();
-	hold(2600);
+	hold(500);
 	rest();
 
 	// The letter is scanned. Nobody is at the window.
-	const DIFF = [{ do: "menu", command: "code-changes" }, { do: "click", sel: `${PANEL} [role=option]`, text: "AGENTS\\.md" }];
-	await checkpoint("wake", DIFF);
-	hold(900);
+	await checkpoint("wake");
+	hold(200);
 	fs.copyFileSync(path.join(import.meta.dirname, "water-bill.pdf"), path.join(scans, "water-bill.pdf"));
 	await page.waitForFunction(() => document.querySelectorAll("[data-slot=message-scroller-content] img").length >= 2, undefined, { timeout: 60_000 });
 	await pictures();
 	// The model takes its time before it writes the line (s.bill): the chapter turns in that pause.
-	await checkpoint("due", DIFF);
+	await checkpoint("due");
 	await said(/Added to/);
 	await quiet();
-	hold(900);
-	await click({ sel: `${PANEL} [aria-label="Back to the list"]` });
+	// What came of it, beside the conversation: the line in its list.
+	await click({ sel: "[data-toggle=code]" });
+	await click({ sel: `${PANEL} [role=tab]`, text: "^Changes$" });
 	await click({ sel: `${PANEL} [role=option]`, text: "TODO\\.md" });
 	await quiet();
-	hold(4200);
+	hold(2400);
 	rest();
 	end();
 	await pictures();
@@ -830,7 +867,66 @@ async function log() {
 // ---- the app's page, and the recordings --------------------------------------------------------------
 
 if (!argv.includes("--no-build") || !fs.existsSync(path.join(desktop, "dist", "index.html"))) execFileSync(process.execPath, [path.join(desktop, "scripts", "build.mjs")], { stdio: "inherit" });
-const STORIES = { hero, code, events, log };
+/** Until `test` is true, or say what was waited for. */
+async function until(test, what, ms = 60_000) {
+	const from = Date.now();
+	while (!(await test())) {
+		if (Date.now() - from > ms) throw new Error(`waited ${ms / 1000}s for ${what}`);
+		await sleep(100);
+	}
+}
+
+/** A swarm: the job is handed out to a dozen sub-agents on one board, the view shows all of pine at work, and the answer is checked. */
+async function swarm() {
+	const locales = path.join(shop, "locales");
+	write(path.join(locales, "en.json"), `${JSON.stringify(EN, null, 2)}\n`);
+	git("add", ".");
+	git("commit", "-q", "-m", "the shop's words");
+	const done = () => LANGUAGES.filter(([code]) => fs.existsSync(path.join(locales, `${code}.json`))).length;
+
+	// The shop's folder, opened for a conversation of the main agent.
+	await menu(`folder:${shop}`);
+	await sees("[data-slot=dialog-title] >> text=Which agent works in");
+	await page.keyboard.press("Enter");
+	await sees("[data-slot=tab][data-active] [data-slot=tab-name] >> text=shop");
+	// The window is the conversation and the overview, which stays open throughout: the side bar is folded
+	// away for the overview's room. A window that starts at a chapter is made so too (each checkpoint's setup).
+	const VIEW = [{ do: "menu", command: "sidebar" }, { do: "menu", command: "view" }];
+	for (const a of VIEW) await menu(a.command);
+	await sees("[data-slot=view-frame][data-ready]", 30_000);
+	await quiet();
+
+	await checkpoint("swarm", VIEW);
+	await tell(`/swarm ${SWARM_JOB}`);
+	rest();
+	// The lead looks, then hands the job out: the sub-agents start.
+	await until(() => asked.some((a) => a.startsWith("Translate locales/en.json into")), "the sub-agents to start");
+	await sleep(600);
+
+	// All of pine at once: the lead, its dozen sub-agents, and the other agents that events wake meanwhile.
+	await checkpoint("overview", VIEW, { busy: true });
+	for (const key of ["mail", "stream", "mqtt"]) {
+		await sleep(700);
+		const e = EVENTS.find((x) => x.key === key);
+		const r = await api("POST", "/events", { topic: `source/${e.key}/${e.event}`, payload: e.payload, trust: "untrusted" });
+		if (r.status && r.status >= 400) throw new Error(`event ${key}: ${JSON.stringify(r)}`);
+	}
+	await sleep(1800);
+
+	// The board fills: each task done in turn.
+	await checkpoint("board", VIEW, { busy: true });
+	await until(() => done() === LANGUAGES.length, "every language's file", 90_000);
+
+	// The answer, and pine's check of it by a sub-agent that did none of the work.
+	await checkpoint("check", VIEW, { busy: true });
+	await said(/speaks 13 languages/, 90_000);
+	await said(/answer was checked/, 90_000);
+	await quiet();
+	hold(3000);
+	end();
+}
+
+const STORIES = { hero, code, events, log, swarm };
 for (const name of sections) {
 	console.log(`recording ${name}`);
 	try {
@@ -860,6 +956,9 @@ if (!process.exitCode) {
 	fs.rmSync(path.join(out, "assets"), { recursive: true, force: true });
 	fs.mkdirSync(path.join(out, "assets"), { recursive: true });
 	for (const f of wantedFiles) fs.copyFileSync(path.join(dist, "assets", f), path.join(out, "assets", f));
+	// The page of the view's frame (the app's view panel runs a view in it), with its script among the files above.
+	// It keeps the recording's time as the page around it does (view-clock.js, beside reel.js).
+	write(path.join(out, "view.html"), fs.readFileSync(path.join(dist, "view.html"), "utf8").replace(/(\s*)<script type="module"/, '$1<script src="./view-clock.js"></script>$1<script type="module"'));
 	write(listFile, JSON.stringify(lists, null, "\t"));
 	write(path.join(out, "index.html"), html.replace(/<title>.*?<\/title>/, '<title>Pine</title>\n\t\t<meta name="robots" content="noindex" />').replace(/(\s*)<script type="module"/, '$1<script src="./reel.js"></script>$1<script type="module"'));
 	console.log(`the app's page: ${wantedFiles.size} of ${all.size} files`);

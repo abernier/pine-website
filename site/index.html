@@ -53,10 +53,10 @@
 	</nav>
 
 	<ol class="g show-list steps" aria-label="An agent for the bills">
-		<li class="on" data-show="make" style="--c: 1 / 4; --cm: 1 / 4; --cs: 1 / 3"><i>00.1</i><b>Make</b><span>You ask main for an agent, and allow it.</span></li>
-		<li data-show="tell" style="--c: 4 / 7; --cm: 4 / 7; --cs: 3 / 5"><i>00.2</i><b>Tell</b><span>You say what to watch. It writes that into its AGENTS.md.</span></li>
-		<li data-show="wake" style="--c: 7 / 10; --cm: 1 / 4; --cs: 1 / 3"><i>00.3</i><b>Wake</b><span>A letter is scanned. The agent wakes and reads both pages.</span></li>
-		<li data-show="due" style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5"><i>00.4</i><b>Respond</b><span>Whom to pay, how much, by when: a line in TODO.md.</span></li>
+		<li class="on" data-show="make" style="--c: 1 / 4; --cm: 1 / 4; --cs: 1 / 3"><i>00.1</i><b>Make</b><span>Ask your main agent to create other agents.</span></li>
+		<li data-show="tell" style="--c: 4 / 7; --cm: 4 / 7; --cs: 3 / 5"><i>00.2</i><b>Chat</b><span>Give it instructions. Agents in pine know their manuals well.</span></li>
+		<li data-show="wake" style="--c: 7 / 10; --cm: 1 / 4; --cs: 1 / 3"><i>00.3</i><b>Wake</b><span>Agents wake up on subscribed events in realtime.</span></li>
+		<li data-show="due" style="--c: 10 / 13; --cm: 4 / 7; --cs: 3 / 5"><i>00.4</i><b>Respond</b><span>Your instructions tell it how to respond.</span></li>
 	</ol>
 
 	<div class="g">
@@ -149,12 +149,12 @@
 			<p class="h3">You ask.<br>It writes<br>the code.</p>
 			<ol class="show-list">
 					<li class="on" data-show="folder"><i>02.1</i><b>Folder</b><span>Open one. The conversation works in it.</span></li>
-					<li data-show="worktree"><i>02.2</i><b>Worktree</b><span>A branch of its own. Merge it when you like it.</span></li>
-					<li data-show="diff"><i>02.3</i><b>Diff</b><span>What changed, line by line, beside the conversation.</span></li>
-					<li data-show="run"><i>02.4</i><b>Run<em aria-hidden="true">▶</em></b><span>What takes a secret, you run: in your terminal, with a click.</span></li>
+					<li data-show="worktree"><i>02.2</i><b>Worktree</b><span>Worktrees allow multiple agents to work safely on the same repo.</span></li>
+					<li data-show="diff"><i>02.3</i><b>Diff</b><span>Changes can be inspected at any time.</span></li>
+					<li data-show="run"><i>02.4</i><b>Run<em aria-hidden="true">▶</em></b><span>Pine has a terminal inbuilt. Agents wake and react to the commands you run.</span></li>
 					<li data-show="steps"><i>02.5</i><b>Steps</b><span>It keeps a list of steps, and ticks them off.</span></li>
-					<li data-show="goal"><i>02.6</i><b>Goal</b><span>It goes on until the goal is met.</span></li>
-					<li data-show="browser"><i>02.7</i><b>Browser</b><span>It opens the page. You see it, and can use it.</span></li>
+					<li data-show="goal"><i>02.6</i><b>Goal</b><span>Goals are checked by blind judges that qualify the results.</span></li>
+					<li data-show="browser"><i>02.7</i><b>Browser</b><span>Pine ships with an inbuilt browser.</span></li>
 				</ol>
 		</div>
 		<div class="shot bleed-r" style="--w: 1280; --h: 800; --xs: 250; --ws: 560; --c: 3 / 13; --cm: 1 / -1" data-reel="code"></div>
@@ -162,31 +162,61 @@
 	<div class="g pad-b"></div>
 </section>
 
-<!-- ============================================================ 03 · MODES -->
+<!-- ============================================================ 03 · SWARM -->
+<section class="panel t-light swarm" aria-labelledby="swarm-h">
+	<div class="guides g" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+	<div class="g meta bottom-rule">
+		<span style="--c: 1 / 4; --cm: 1 / 3; --cs: 1 / 3">03 — Swarm</span>
+		<span style="--c: 4 / 7; --cm: 3 / 5" class="hide-s">One job, many agents</span>
+		<span style="--c: 7 / 10" class="hide-m">Shared on one board</span>
+		<span style="--c: 10 / 13; --cm: 5 / 7; --cs: 3 / 5" class="r">Checked before it's done</span>
+	</div>
+
+	<div class="g">
+		<h2 id="swarm-h" class="mega" aria-label="Swarm"><span data-drift>Swarm</span></h2>
+	</div>
+
+	<div class="g layered">
+		<div class="side-note" style="--c: 1 / 3; --cm: 1 / -1">
+			<p class="h3">Agent swarms:<br>fan your most complex tasks out.</p>
+			<ol class="show-list">
+				<li class="on" data-show="swarm"><i>03.1</i><b>Swarm</b><span>Complex work can be fanned out to multiple agents in parallel.</span></li>
+				<li data-show="overview"><i>03.2</i><b>Overview</b><span>All of pine at a glance: who works on what, right now.</span></li>
+				<li data-show="board"><i>03.3</i><b>Board</b><span>Message boards for agents are inbuilt.</span></li>
+				<li data-show="check"><i>03.4</i><b>Check</b><span>Blind judges check against the results.</span></li>
+			</ol>
+		</div>
+		<div class="shot bleed-r" style="--w: 1280; --h: 800; --xs: 250; --ws: 560; --c: 3 / 13; --cm: 1 / -1" data-reel="swarm"></div>
+	</div>
+	<div class="g pad-b"></div>
+</section>
+
+<!-- ============================================================ 04 · MODES -->
 <section class="panel t-mid modes" aria-labelledby="modes-h">
 	<div class="guides g" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
 	<div class="g meta bottom-rule">
-		<span style="--c: 1 / 4; --cm: 1 / 3; --cs: 1 / 3" id="modes-h">03 — Reach</span>
+		<span style="--c: 1 / 4; --cm: 1 / 3; --cs: 1 / 3" id="modes-h">04 — Reach</span>
 		<span style="--c: 4 / 7; --cm: 3 / 5" class="hide-s">You say how far</span>
 		<span style="--c: 7 / 10" class="hide-m">The system enforces it</span>
 		<span style="--c: 10 / 13; --cm: 5 / 7; --cs: 3 / 5" class="r">sandbox-exec · bwrap</span>
 	</div>
 
 	<ol class="stack">
-		<li class="solid"><span class="w" data-drift>Safe</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>01</b>In the sandbox. Asks before anything leaves.</span></span></li>
-		<li class="line"><span class="w" data-drift="-1">Manual</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>02</b>In the sandbox. Asks before each action.</span></span></li>
-		<li class="white"><span class="w" data-drift>Auto</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>03</b>Your account. Asks when it matters.</span></span></li>
-		<li class="line"><span class="w" data-drift="-1">Bypass</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>04</b>Your account. Asks nothing.</span></span></li>
+		<li class="solid"><span class="w" data-drift>Safe</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>01</b>Asks before anything leaves the sandbox.</span></span></li>
+		<li class="line"><span class="w" data-drift="-1">Manual</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>02</b>Asks before each actions.</span></span></li>
+		<li class="white"><span class="w" data-drift>Auto</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>03</b>Asks when it matters.</span></span></li>
+		<li class="line"><span class="w" data-drift="-1">Bypass</span><span class="g note"><span style="--c: 10 / 13; --cm: 4 / 7; --cs: 2 / 5"><b>04</b>Never asks.</span></span></li>
 	</ol>
 </section>
 
-<!-- ============================================================ 04 · INSTALL -->
+<!-- ============================================================ 05 · INSTALL -->
 <section class="panel t-paper install" id="install" aria-labelledby="install-h">
 	<div class="guides g" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
 	<div class="g meta bottom-rule">
-		<span style="--c: 1 / 4; --cm: 1 / 3; --cs: 1 / 3">04 — Install</span>
+		<span style="--c: 1 / 4; --cm: 1 / 3; --cs: 1 / 3">05 — Install</span>
 		<span style="--c: 4 / 7; --cm: 3 / 5" class="hide-s">Your machine</span>
 		<span style="--c: 7 / 10" class="hide-m">Your models, or anyone's</span>
 		<span style="--c: 10 / 13; --cm: 5 / 7; --cs: 3 / 5" class="r">MIT</span>
@@ -199,7 +229,7 @@
 
 	<div class="g cards">
 		<div class="card dark" style="--c: 1 / 7; --cm: 1 / -1">
-			<p class="card-h"><span>Terminal</span><i>04.1</i></p>
+			<p class="card-h"><span>Terminal</span><i>05.1</i></p>
 			<div class="cmd">
 				<code><span>$</span> npm install -g @pmndre/pine</code>
 				<code><span>$</span> pine init</code>
@@ -207,11 +237,11 @@
 			</div>
 		</div>
 		<a class="card grey" style="--c: 7 / 10; --cm: 1 / 4; --cs: 1 / -1" href="https://github.com/pmndre/pine/releases/latest">
-			<p class="card-h"><span>App</span><i>04.2</i></p>
+			<p class="card-h"><span>App</span><i>05.2</i></p>
 			<p class="card-big">Pine<span>macOS · Linux · Windows ↓</span></p>
 		</a>
 		<a class="card outline" style="--c: 10 / 13; --cm: 4 / 7; --cs: 1 / -1" href="https://github.com/pmndre/pine">
-			<p class="card-h"><span>Source</span><i>04.3</i></p>
+			<p class="card-h"><span>Source</span><i>05.3</i></p>
 			<p class="card-big">GitHub<span>pmndre/pine ↗</span></p>
 		</a>
 	</div>

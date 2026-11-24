@@ -19,7 +19,7 @@ const app = () => ({
 			const file = path.join(import.meta.dirname, decodeURIComponent(url));
 			// (The player is the site's own file: Vite serves it from site/public.)
 			if (url === "/app/reel.js" || !file.startsWith(path.join(import.meta.dirname, "app")) || !fs.existsSync(file) || !fs.statSync(file).isFile()) return next();
-			res.writeHead(200, { "content-type": TYPES[path.extname(file)] ?? "application/octet-stream", "cache-control": "no-cache" });
+			res.writeHead(200, { "content-type": TYPES[path.extname(file)] ?? "application/octet-stream", "cache-control": "no-cache", "access-control-allow-origin": "*" });
 			fs.createReadStream(file).pipe(res);
 		});
 	},
@@ -28,5 +28,9 @@ const app = () => ({
 export default defineConfig({
 	root: "site",
 	build: { outDir: "..", emptyOutDir: false },
+	// The view's frame is sandboxed, so its origin is "null": its module scripts load only with CORS
+	// (site/public/_headers does the same where Cloudflare serves the site).
+	server: { cors: true },
+	preview: { cors: true },
 	plugins: [app()],
 });
