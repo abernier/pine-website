@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { defineConfig } from "vite";
@@ -22,6 +23,18 @@ const app = () => ({
 			res.writeHead(200, { "content-type": TYPES[path.extname(file)] ?? "application/octet-stream", "cache-control": "no-cache", "access-control-allow-origin": "*" });
 			fs.createReadStream(file).pipe(res);
 		});
+	},
+	// The player and the view's clock keep their names from one version of the site to the next, and browsers
+	// keep such a file for hours: the pages that load them name them with their content's hash, so that a new
+	// player is a new address, and a visitor who was here before never plays new recordings with an old one.
+	closeBundle() {
+		const hash = (name) => createHash("sha256").update(fs.readFileSync(path.join(import.meta.dirname, "app", name))).digest("hex").slice(0, 10);
+		for (const [page, name] of [["index.html", "reel.js"], ["view.html", "view-clock.js"]]) {
+			const file = path.join(import.meta.dirname, "app", page);
+			if (!fs.existsSync(file)) continue;
+			const re = new RegExp(`src="\\./${name.replace(".", "\\.")}(\\?v=[0-9a-f]+)?"`);
+			fs.writeFileSync(file, fs.readFileSync(file, "utf8").replace(re, `src="./${name}?v=${hash(name)}"`));
+		}
 	},
 });
 

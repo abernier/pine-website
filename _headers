@@ -2,11 +2,3 @@
 # loads from here are fetched cross-origin, and need this to load at all.
 /app/assets/*
   Access-Control-Allow-Origin: *
-
-# The player and the view's clock keep their names from one version of the site to the next (the app's own
-# files carry a hash): a browser asks for them anew each time, so that it never plays new recordings with an
-# old player.
-/app/reel.js
-  Cache-Control: no-cache
-/app/view-clock.js
-  Cache-Control: no-cache
