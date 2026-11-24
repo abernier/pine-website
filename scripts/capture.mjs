@@ -952,6 +952,10 @@ if (!process.exitCode) {
 	const all = new Set(fs.readdirSync(path.join(dist, "assets")));
 	// (A file of an earlier build of the app is not one of this build's.)
 	for (const name of sections) lists[name] = [...used].filter((f) => all.has(f)).sort();
+	// A story recorded before this build loaded its files under that build's names. The page that plays it is
+	// this build's, which loads the same files under new names: the file of the same name before its hash.
+	const stem = (f) => f.replace(/-[\w-]{8}(\.\w+)$/, "$1");
+	for (const name of Object.keys(lists)) lists[name] = [...new Set(lists[name].map((f) => (all.has(f) ? f : ([...all].find((g) => stem(g) === stem(f)) ?? f))))].sort();
 	const wantedFiles = new Set([...names, ...Object.values(lists).flat().filter((f) => all.has(f))]);
 	fs.rmSync(path.join(out, "assets"), { recursive: true, force: true });
 	fs.mkdirSync(path.join(out, "assets"), { recursive: true });
