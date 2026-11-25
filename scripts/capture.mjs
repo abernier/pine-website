@@ -604,8 +604,16 @@ function finish({ feed = false } = {}) {
 			const text = JSON.stringify(r);
 			if (!index.has(text)) (index.set(text, pool.length), pool.push(r));
 			(calls[key] ??= []).push([rel(e.at), index.get(text)]);
-		} else if (e.k === "invoke" && e.ch === "pine:state") state = e.r;
-		else if (e.k === "invoke") { if (["pine:term-open", "pine:term-run", "pine:pick-folder"].includes(e.ch)) (invoke[e.ch] ??= []).push([rel(e.at), e.r]); }
+		} else if (e.k === "invoke" && e.ch === "pine:state") {
+			// The page that plays a story has no window of the app's to keep a layout for: it is told its tabs as the web
+			// client is, by /ui/tabs (below), and lays itself out as a page of its own does.
+			const { windowLayout, chromeLayout, ...rest } = e.r ?? {};
+			state = rest;
+		} else if (e.k === "invoke" && e.ch === "pine:window-layout") {
+			// The app's window says what tabs it has here (it no longer tells pine's /ui/tabs itself): they are the tabs of that moment.
+			const l = e.a[0];
+			if (l?.tabs) tabs.push([rel(e.at), { tabs: l.tabs, active: l.active ?? 0, code: l.code === true }]);
+		} else if (e.k === "invoke") { if (["pine:term-open", "pine:term-run", "pine:pick-folder"].includes(e.ch)) (invoke[e.ch] ??= []).push([rel(e.at), e.r]); }
 		else if (e.k === "send") { if (["pine:events", "pine:term-data", "pine:term-exit", "pine:term-run", "pine:init-line"].includes(e.ch)) tl.push([rel(e.t), "send", e.ch, e.a]); }
 		else tl.push([rel(e.t), e.k, e.a]);
 	}
@@ -748,7 +756,7 @@ async function code() {
 
 	// What the last message changed, file by file.
 	await checkpoint("diff", [{ do: "menu", command: "code-changes" }]);
-	await click(TAB("Last turn"));
+	await click({ sel: `${PANEL} [data-slot=toggle-group-item]`, text: "^Last turn" });
 	await click({ sel: `${PANEL} [role=option]`, text: "checkout\\.tsx" });
 	await quiet();
 	hold(3000);
@@ -816,7 +824,8 @@ async function events() {
 	for (const e of EVENTS) {
 		const session = e.yours ? "heatpump" : e.key;
 		// The window as it is before the event: the conversation the event belongs to, in front, with nothing in it yet.
-		await api("POST", "/ui/tabs", { tabs: [{ agent: "main", session: "main" }, { agent: e.agent, session }], active: 1, code: false });
+		// (The window keeps its tabs itself: they are handed to it as the page hands them over, and it is loaded anew.)
+		await page.evaluate((tabs) => window.pine.windowLayout({ tabs, active: 1, code: false }), [{ agent: "main", session: "main" }, { agent: e.agent, session }]);
 		await page.reload();
 		await sees(`[data-slot=tab][data-active] >> text=${e.agent}`, 60_000);
 		await checkpoint(`ev-${e.key}`);

@@ -56,6 +56,16 @@
 	setInterval(() => {
 		for (const f of document.querySelectorAll("iframe[data-slot=view-frame]")) f.contentWindow?.postMessage({ reelNow: ReelDate.now() }, "*");
 	}, 200);
+	// A scroll area measures whether its content overflows when it is laid out, and the app's own window is laid out
+	// again when it is shown. This frame never is: a list measured while the page was still settling keeps a scrollbar
+	// for content it no longer has (the side bar with a handful of agents). One whose mark is wrong measures again.
+	setInterval(() => {
+		for (const v of document.querySelectorAll("[data-slot=scroll-area-viewport]")) {
+			const area = v.closest("[data-slot=scroll-area]");
+			const marked = area?.hasAttribute("data-has-overflow-y");
+			if (area && marked !== v.scrollHeight > v.clientHeight + 1) v.dispatchEvent(new Event("scroll"));
+		}
+	}, 500);
 
 	// What the app keeps in the browser (which list is folded, how wide a panel is) is this window's alone.
 	const kept = new Map();
