@@ -664,3 +664,4 @@ a.card:hover { transform: translateY(-4px); }
 .dl-os[data-phone="android"] [data-only="ios"], .dl-os[data-phone="ios"] [data-only="android"] { display: none; }
 .dl-lead { font-size: clamp(15px, 1.3cqw, 19px); line-height: 1.35; letter-spacing: -0.01em; text-wrap: pretty; }
 .dl-share .copy-btn { position: static; height: auto; min-height: 32px; padding: 8px 14px; line-height: 16px; white-space: normal; text-align: left; }
+.dl-web { margin-top: -10px; padding-top: 14px; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1); }
