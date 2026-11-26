@@ -326,6 +326,14 @@ if (card) {
 		// Only the question just before the link changes: "Debian or Ubuntu? ... · ARM? " keeps its start.
 		if (before?.textContent) before.textContent = before.textContent.replace(/[^·?]*\?\s*$/, (m) => `${m.startsWith(" ") ? " " : ""}${question}? `);
 		info.firstChild.textContent = `${name} · `;
+		// On Linux the .deb follows the AppImage: the visitor's own kind first, the other beside the other AppImage.
+		const deb = pane?.querySelector<HTMLAnchorElement>("[data-dl-deb]");
+		const altDeb = pane?.querySelector<HTMLAnchorElement>("[data-dl-alt-deb]");
+		if (deb && altDeb) {
+			deb.dataset.dlFile = kind === "arm" ? "linux-deb-arm64" : "linux-deb-x64";
+			altDeb.dataset.dlFile = kind === "arm" ? "linux-deb-x64" : "linux-deb-arm64";
+			altDeb.textContent = kind === "arm" ? ".deb for x86_64" : ".deb for arm64";
+		}
 		link();
 	}).catch(() => {});
 
@@ -334,6 +342,7 @@ if (card) {
 		"win-x64": /-x64-setup\.exe$/, "win-arm64": /-arm64-setup\.exe$/,
 		"linux-appimage-x64": /-x86_64\.AppImage$/, "linux-appimage-arm64": /-arm64\.AppImage$/,
 		"linux-deb-x64": /-amd64\.deb$/,
+		"linux-deb-arm64": /-arm64\.deb$/,
 		android: /\.apk$/,
 	};
 	let assets: Array<{ name: string; browser_download_url: string }> = [];
